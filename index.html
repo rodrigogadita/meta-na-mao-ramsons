@@ -71,6 +71,25 @@
   .menu-ic{font-size:28px;margin-bottom:6px}
   .menu-tit{font-family:'Poppins';font-weight:800;font-size:17px;color:var(--ink)}
   .menu-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.4}
+
+  /* DEEP LINK */
+  .deep-link{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);
+    background:var(--cloud);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:16px}
+  .deep-link span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .copy-btn{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 10px;
+    font-size:11px;font-weight:700;cursor:pointer;color:var(--red);font-family:inherit}
+  .copy-btn:hover{border-color:var(--red)}
+
+  /* TABELA EFICIÊNCIA */
+  .eff-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;overflow-x:auto}
+  .eff-table{width:100%;border-collapse:collapse;font-size:13.5px;white-space:nowrap}
+  .eff-table th{text-align:left;color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.5px;padding:10px 12px;border-bottom:2px solid var(--line)}
+  .eff-table td{padding:11px 12px;border-bottom:1px solid var(--line);font-weight:600;color:var(--ink)}
+  .eff-table tr:last-child td{border-bottom:none}
+  .eff-table tr.eff-atual td{background:var(--gold-soft);color:#8a6d00;font-weight:800}
+  .eff-table tr.eff-atual td:first-child{border-radius:8px 0 0 8px}
+  .eff-table tr.eff-atual td:last-child{border-radius:0 8px 8px 0}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .step-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:4px}
   .step h2{font-size:21px;font-weight:700;margin-bottom:4px}
@@ -227,10 +246,16 @@
         <span class="menu-tit">Calcular Parcela</span>
         <span class="menu-sub">Crédito Ramsons / Cartão — mostre o valor por mês e feche o serviço agregado</span>
       </button>
+      <button class="menu-card" onclick="showScreen('Eficiencia')">
+        <span class="menu-ic">📈</span>
+        <span class="menu-tit">Calcular Eficiência</span>
+        <span class="menu-sub">Seguro ÷ Produto — veja seu nível e o potencial de venda</span>
+      </button>
     </div>
   </div>
 
   <div class="screen" id="screenMetas">
+  <div class="deep-link" id="dlMetas">🔗 <span id="dlMetasUrl"></span><button class="copy-btn" onclick="copiarLink('dlMetasUrl', this)">Copiar</button></div>
 
   <!-- STEP 1 -->
   <section class="step on" data-step="1">
@@ -384,6 +409,7 @@
 
   <!-- CALCULAR PARCELA -->
   <div class="screen" id="screenParcela">
+    <div class="deep-link" id="dlParcela">🔗 <span id="dlParcelaUrl"></span><button class="copy-btn" onclick="copiarLink('dlParcelaUrl', this)">Copiar</button></div>
     <div class="card grid">
       <div class="field">
         <label>Método de pagamento</label>
@@ -454,9 +480,44 @@
     <p class="clear-link" onclick="limparParcela()">🗑 Limpar esta simulação</p>
   </div>
 
+  <!-- CALCULAR EFICIÊNCIA -->
+  <div class="screen" id="screenEficiencia">
+    <div class="deep-link" id="dlEficiencia">🔗 <span id="dlEficienciaUrl"></span><button class="copy-btn" onclick="copiarLink('dlEficienciaUrl', this)">Copiar</button></div>
+    <div class="card grid">
+      <div class="field">
+        <label><span class="dot" style="background:#DD2638"></span>Valor do produto<span class="kind">valor R$</span></label>
+        <div class="inp-wrap"><span class="pre">R$</span><input type="tel" inputmode="numeric" id="efProduto" placeholder="0,00" autocomplete="off"></div>
+      </div>
+      <div class="field">
+        <label><span class="dot" style="background:#1E9E6A"></span>Valor do seguro<span class="kind">valor R$</span></label>
+        <div class="inp-wrap"><span class="pre">R$</span><input type="tel" inputmode="numeric" id="efSeguro" placeholder="0,00" autocomplete="off"></div>
+      </div>
+    </div>
+    <div class="err" id="errEficiencia"></div>
+
+    <div id="efResultado" style="display:none">
+      <div class="sec-h"><span class="bar"></span><h3>Sua eficiência</h3></div>
+      <div class="gauge-card">
+        <div class="lbl" style="margin-bottom:2px">Seguro ÷ Produto × 100</div>
+        <div class="big" id="efPct">0%</div>
+      </div>
+
+      <p class="sim-result" id="efMsg" style="margin-top:14px"></p>
+
+      <div class="sec-h"><span class="bar"></span><h3>Potencial de venda por eficiência</h3><span class="hint">ref. R$ 200.000/mês em Produtos</span></div>
+      <div class="eff-card">
+        <table class="eff-table" id="efTable">
+          <thead><tr><th>Eficiência</th><th>Valor da Garantia</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="clear-link" onclick="limparEficiencia()">🗑 Limpar esta simulação</p>
+  </div>
+
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 /* ---------- Config das metas ---------- */
 const PRODUTOS = [
@@ -723,6 +784,19 @@ function atualizarSimulador(X2, X, Y, conv, diasVenda, max){
 }
 
 /* ---------- Compartilhar no WhatsApp ---------- */
+let _html2canvasPromise = null;
+function carregarHtml2Canvas(){
+  if(window.html2canvas) return Promise.resolve();
+  if(_html2canvasPromise) return _html2canvasPromise;
+  _html2canvasPromise = new Promise((resolve, reject)=>{
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = resolve;
+    s.onerror = ()=>{ _html2canvasPromise=null; reject(new Error('falha ao carregar html2canvas')); };
+    document.head.appendChild(s);
+  });
+  return _html2canvasPromise;
+}
 async function compartilharResultado(){
   const area = document.getElementById('shareArea');
   const btn = document.getElementById('btnShare');
@@ -730,6 +804,7 @@ async function compartilharResultado(){
   btn.disabled = true; btn.textContent = 'Gerando imagem...';
   const texto = `Minha meta na mão (${nomeMes}): preciso fechar ${state.Y} clientes/dia em ${state.diasVenda} dias de venda pra bater a meta. 💪 Time Ramsons`;
   try{
+    await carregarHtml2Canvas();
     if(document.fonts && document.fonts.ready) await document.fonts.ready;
     const canvas = await html2canvas(area, {backgroundColor:'#F4F6FA', scale:Math.max(3, window.devicePixelRatio||1), useCORS:true});
     const blob = await new Promise(res=>canvas.toBlob(res,'image/png',1));
@@ -872,13 +947,15 @@ function limparTudo(){
   show(1);
 }
 
-/* ---------- Navegação entre telas (Menu / Metas / Parcela) ---------- */
+/* ---------- Navegação entre telas (Menu / Metas / Parcela / Eficiência) ---------- */
+const SLUGS = {metas:'Metas', parcela:'Parcela', eficiencia:'Eficiencia'};
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id==='screen'+name));
   const headers = {
-    Menu:    {eyebrow:'Ferramentas de venda', title:'Escolha sua calculadora', desc:'Tudo que você precisa pra fechar a venda, na palma da mão.'},
-    Metas:   {eyebrow:'Planejamento de metas', title:'Meta na Mão', desc:'Descubra quanto você precisa vender por dia e por cliente para bater a meta do mês.'},
-    Parcela: {eyebrow:'Fechamento de venda', title:'Calcular Parcela', desc:'Mostre pro cliente quanto sai por mês — produto e serviço juntos.'}
+    Menu:       {eyebrow:'Ferramentas de venda', title:'Escolha sua calculadora', desc:'Tudo que você precisa pra fechar a venda, na palma da mão.'},
+    Metas:      {eyebrow:'Planejamento de metas', title:'Meta na Mão', desc:'Descubra quanto você precisa vender por dia e por cliente para bater a meta do mês.'},
+    Parcela:    {eyebrow:'Fechamento de venda', title:'Calcular Parcela', desc:'Mostre pro cliente quanto sai por mês — produto e serviço juntos.'},
+    Eficiencia: {eyebrow:'Fechamento de venda', title:'Calcular Eficiência', desc:'Seguro ÷ Produto × 100 — veja seu nível e o potencial de venda.'}
   };
   const h = headers[name];
   document.getElementById('hdrEyebrow').textContent = h.eyebrow;
@@ -886,7 +963,28 @@ function showScreen(name){
   document.getElementById('hdrDesc').textContent = h.desc;
   document.getElementById('progress').style.display = name==='Metas' ? 'flex' : 'none';
   if(name==='Metas') paintProgress();
+
+  const slug = Object.keys(SLUGS).find(k=>SLUGS[k]===name) || '';
+  history.replaceState(null, '', slug ? '#'+slug : location.pathname+location.search);
+
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- Links diretos por calculadora ---------- */
+function popularLinks(){
+  const base = location.origin + location.pathname;
+  Object.keys(SLUGS).forEach(slug=>{
+    const el = document.getElementById('dl'+SLUGS[slug]+'Url');
+    if(el) el.textContent = base+'#'+slug;
+  });
+}
+function copiarLink(id, btn){
+  const text = document.getElementById(id).textContent;
+  const original = btn.textContent;
+  const marcarCopiado = ()=>{ btn.textContent='Copiado!'; setTimeout(()=>btn.textContent=original, 1500); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(marcarCopiado).catch(()=>{});
+  }
 }
 
 /* ---------- Calcular Parcela ---------- */
@@ -958,6 +1056,86 @@ function limparParcela(){
   document.getElementById('pcResultado').style.display='none';
   document.getElementById('errParcela').textContent='';
 }
+
+/* ---------- Calcular Eficiência ---------- */
+const TABELA_EFICIENCIA = [
+  {pct:1.00, garantia:2000},
+  {pct:1.75, garantia:3500},
+  {pct:2.00, garantia:4000},
+  {pct:3.00, garantia:6000},
+  {pct:4.00, garantia:8000},
+  {pct:6.00, garantia:12000},
+  {pct:7.00, garantia:14000},
+  {pct:8.00, garantia:16000},
+  {pct:9.00, garantia:18000},
+  {pct:10.00, garantia:20000},
+];
+const fmtPct = n => n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+
+document.getElementById('efProduto').addEventListener('input', e=>{ maskBRL(e.target); calcularEficiencia(); });
+document.getElementById('efSeguro').addEventListener('input', e=>{ maskBRL(e.target); calcularEficiencia(); });
+
+function calcularEficiencia(){
+  const produto = parseFloat(document.getElementById('efProduto').dataset.val||0);
+  const seguro = parseFloat(document.getElementById('efSeguro').dataset.val||0);
+  const err = document.getElementById('errEficiencia');
+  const resWrap = document.getElementById('efResultado');
+
+  if(!produto || !seguro){
+    resWrap.style.display='none';
+    err.textContent='';
+    return;
+  }
+  err.textContent='';
+
+  const pct = (seguro/produto)*100;
+  document.getElementById('efPct').textContent = fmtPct(pct);
+  renderTabelaEficiencia(pct);
+  resWrap.style.display='block';
+}
+
+function renderTabelaEficiencia(pctAtual){
+  const tbody = document.querySelector('#efTable tbody');
+  tbody.innerHTML='';
+
+  let nivelAtual=null, proximoNivel=null;
+  TABELA_EFICIENCIA.forEach(row=>{
+    if(row.pct<=pctAtual) nivelAtual=row;
+    if(row.pct>pctAtual && proximoNivel===null) proximoNivel=row;
+  });
+
+  TABELA_EFICIENCIA.forEach(row=>{
+    const tr=document.createElement('tr');
+    if(nivelAtual && row.pct===nivelAtual.pct) tr.className='eff-atual';
+    tr.innerHTML = `<td>${fmtPct(row.pct)}</td><td>${fmtBRL0(row.garantia)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const msgEl = document.getElementById('efMsg');
+  if(nivelAtual){
+    let msg = `Sua eficiência de <b>${fmtPct(pctAtual)}</b> já alcança a faixa de <b>${fmtPct(nivelAtual.pct)}</b>, equivalente a <b>${fmtBRL0(nivelAtual.garantia)}/mês</b> em Garantia (considerando R$ 200.000/mês em Produtos).`;
+    if(proximoNivel){
+      msg += ` Faltam <b>${fmtPct(proximoNivel.pct-pctAtual)}</b> pra chegar na faixa de <b>${fmtPct(proximoNivel.pct)}</b> (${fmtBRL0(proximoNivel.garantia)}/mês).`;
+    } else {
+      msg += ` Você já está no topo da tabela de referência. 🔥`;
+    }
+    msgEl.innerHTML = msg;
+  } else {
+    msgEl.innerHTML = `Sua eficiência de <b>${fmtPct(pctAtual)}</b> ainda está abaixo da primeira faixa de referência. Faltam <b>${fmtPct(proximoNivel.pct-pctAtual)}</b> pra chegar em <b>${fmtPct(proximoNivel.pct)}</b>.`;
+  }
+}
+
+function limparEficiencia(){
+  const p=document.getElementById('efProduto'); p.value=''; p.dataset.val=0;
+  const s=document.getElementById('efSeguro'); s.value=''; s.dataset.val=0;
+  document.getElementById('efResultado').style.display='none';
+  document.getElementById('errEficiencia').textContent='';
+}
+
+/* ---------- Roteamento inicial por link direto (#metas, #parcela, #eficiencia) ---------- */
+popularLinks();
+const hashSlug = location.hash.replace('#','').toLowerCase();
+if(SLUGS[hashSlug]) showScreen(SLUGS[hashSlug]);
 
 load();
 paintProgress();
