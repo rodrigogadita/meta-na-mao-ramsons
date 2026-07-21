@@ -147,6 +147,27 @@
   .foot-note{text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px;line-height:1.5}
   .foot-note b{color:var(--navy)}
 
+  /* SIMULADOR DE ABORDAGEM */
+  .sim-funil{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sim-stage{flex:1;text-align:center}
+  .sim-stage .bar-track{height:9px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:8px}
+  .sim-stage .bar-fill{height:100%;border-radius:99px;transition:width .15s ease}
+  .sim-stage.abord .bar-fill{background:linear-gradient(90deg,var(--red),var(--red-deep))}
+  .sim-stage.fecha .bar-fill{background:linear-gradient(90deg,var(--ok),#15804F)}
+  .sim-stage .sim-num{display:block;font-family:'Poppins';font-weight:800;font-size:22px;color:var(--ink)}
+  .sim-stage .sim-lbl{font-size:11px;color:var(--muted);font-weight:600}
+  .sim-arrow{font-size:18px;color:var(--muted);flex:0 0 auto}
+  .sim-range{width:100%;margin:6px 0 4px;-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;background:var(--line);outline:none}
+  .sim-range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer}
+  .sim-range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer}
+  .sim-range-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:600}
+  .sim-result{margin-top:14px;font-size:13.5px;line-height:1.5;color:var(--ink);background:var(--cloud);border-radius:12px;padding:12px 14px}
+  .sim-result b{color:var(--red)}
+  .sim-result .up{color:var(--ok);font-weight:700}
+
+  /* SHARE */
+  .btn-whats{background:linear-gradient(135deg,#25D366,#1DA851);color:#fff;box-shadow:0 8px 18px rgba(37,211,102,.30)}
+
   @media(min-width:600px){
     .headline h1{font-size:28px}
     main{padding:26px 20px 50px}
@@ -246,56 +267,82 @@
 
   <!-- RESULT -->
   <section class="step" data-step="4">
-    <div class="step-title" id="mesNome4">Seu plano do mês</div>
-    <h2>Meta na mão 🎯</h2>
-    <p class="lead" id="resLead"></p>
+    <div id="shareArea">
+      <div class="step-title" id="mesNome4">Seu plano do mês</div>
+      <h2>Meta na mão 🎯</h2>
+      <p class="lead" id="resLead"></p>
 
-    <div class="summary">
-      <div class="row">
-        <div class="box">
-          <div class="k">Dias de venda</div>
-          <div class="v" id="rDias">0</div>
-        </div>
-        <div class="box">
-          <div class="k">Clientes/dia p/ bater</div>
-          <div class="v" id="rClientes">0</div>
+      <div class="summary">
+        <div class="row">
+          <div class="box">
+            <div class="k">Dias de venda</div>
+            <div class="v" id="rDias">0</div>
+          </div>
+          <div class="box">
+            <div class="k">Clientes/dia p/ bater</div>
+            <div class="v" id="rClientes">0</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="sec-h"><span class="bar"></span><h3>Meta diária</h3><span class="hint">dia · por cliente</span></div>
-    <div class="metas" id="rMetas"></div>
+      <div class="sec-h"><span class="bar"></span><h3>Meta diária</h3><span class="hint">dia · por cliente</span></div>
+      <div class="metas" id="rMetas"></div>
 
-    <div class="sec-h"><span class="bar"></span><h3>Sua conversão</h3></div>
-    <div class="gauge-card">
-      <div id="gauge"></div>
-      <div class="big" id="rConv">0%</div>
-      <div class="lbl">de cada cliente abordado vira venda</div>
-      <div class="verdict" id="rVerdict"></div>
-    </div>
-
-    <div class="sec-h"><span class="bar"></span><h3>Meta Resolve (instalação)</h3></div>
-    <div class="resolve-box">
-      <div class="ic">AC</div>
-      <div>
-        <h4>Regra 4 pra 1</h4>
-        <p id="rResolve"></p>
+      <div class="sec-h"><span class="bar"></span><h3>Sua conversão</h3></div>
+      <div class="gauge-card">
+        <div id="gauge"></div>
+        <div class="big" id="rConv">0%</div>
+        <div class="lbl">de cada cliente abordado vira venda</div>
+        <div class="verdict" id="rVerdict"></div>
       </div>
-    </div>
 
-    <div class="sec-h"><span class="bar"></span><h3>Plano de ataque</h3></div>
-    <div class="strategy" id="rStrategy"></div>
+      <div class="sec-h"><span class="bar"></span><h3>E se você abordasse mais?</h3><span class="hint">arraste o número</span></div>
+      <div class="card sim-card">
+        <div class="sim-funil">
+          <div class="sim-stage abord">
+            <div class="bar-track"><div class="bar-fill" id="simFillAbord" style="width:0%"></div></div>
+            <span class="sim-num" id="simNumAbord">0</span>
+            <span class="sim-lbl">abordados/dia</span>
+          </div>
+          <div class="sim-arrow">→</div>
+          <div class="sim-stage fecha">
+            <div class="bar-track"><div class="bar-fill" id="simFillFecha" style="width:0%"></div></div>
+            <span class="sim-num" id="simNumFecha">0</span>
+            <span class="sim-lbl">vendas/dia</span>
+          </div>
+        </div>
+        <input type="range" class="sim-range" id="simRange" min="0" max="0" value="0" step="1">
+        <div class="sim-range-lbl"><span id="simMinLbl">hoje</span><span id="simMaxLbl">+30</span></div>
+        <div class="sim-result" id="simResult"></div>
+      </div>
+
+      <div class="sec-h"><span class="bar"></span><h3>Meta Resolve (instalação)</h3></div>
+      <div class="resolve-box">
+        <div class="ic">AC</div>
+        <div>
+          <h4>Regra 4 pra 1</h4>
+          <p id="rResolve"></p>
+        </div>
+      </div>
+
+      <div class="sec-h"><span class="bar"></span><h3>Plano de ataque</h3></div>
+      <div class="strategy" id="rStrategy"></div>
+
+      <p class="foot-note">Números redondos são metas de esforço, não promessa fechada.<br><b>Time Ramsons</b></p>
+    </div>
 
     <div class="nav">
       <button class="btn btn-ghost" onclick="go(1)">Refazer</button>
-      <button class="btn btn-primary" onclick="window.print()">Salvar / imprimir</button>
+      <button class="btn btn-whats" id="btnShare" onclick="compartilharResultado()">📲 Compartilhar no WhatsApp</button>
     </div>
-
-    <p class="foot-note">Números redondos são metas de esforço, não promessa fechada.<br><b>Time Ramsons</b></p>
+    <div class="nav">
+      <button class="btn btn-ghost" style="flex:1" onclick="window.print()">Salvar / imprimir</button>
+    </div>
   </section>
 
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 /* ---------- Config das metas ---------- */
 const PRODUTOS = [
@@ -316,7 +363,7 @@ document.getElementById('mesNome1').textContent = nomeMes;
 document.getElementById('mesNome2').textContent = nomeMes;
 
 /* ---------- Estado ---------- */
-const state = {metas:{}, folgas:null, abordados:0, efetivados:0};
+const state = {metas:{}, folgas:null, abordados:0, efetivados:0, diasVenda:0, X:0, Y:0, conv:0};
 
 /* ---------- Máscara BRL (centavos) ---------- */
 function maskBRL(el){
@@ -431,6 +478,7 @@ function calcular(){
   const diasVenda = diasNoMes - state.folgas;
   const Y = state.efetivados, X = state.abordados;
   const conv = (Y/X)*100;
+  state.diasVenda=diasVenda; state.X=X; state.Y=Y; state.conv=conv;
 
   document.getElementById('rDias').innerHTML = diasVenda+' <small>dias</small>';
   document.getElementById('rClientes').innerHTML = Y+' <small>clientes</small>';
@@ -479,7 +527,63 @@ function calcular(){
   /* Plano de ataque */
   buildStrategy(diaria, diasVenda, X, Y, conv, resolveDia, arCond);
 
+  /* Simulador de abordagem */
+  setupSimulador(X, Y, conv, diasVenda);
+
   show(4);
+}
+
+/* ---------- Simulador "e se abordasse mais?" ---------- */
+function setupSimulador(X, Y, conv, diasVenda){
+  const range = document.getElementById('simRange');
+  const max = X + 30;
+  range.min = X; range.max = max; range.value = X;
+  document.getElementById('simMinLbl').textContent = 'hoje: '+X+'/dia';
+  document.getElementById('simMaxLbl').textContent = max+'/dia';
+  atualizarSimulador(X, X, Y, conv, diasVenda, max);
+  range.oninput = ()=> atualizarSimulador(parseInt(range.value,10), X, Y, conv, diasVenda, max);
+}
+function atualizarSimulador(X2, X, Y, conv, diasVenda, max){
+  const Y2 = Math.round(X2*conv/100);
+  document.getElementById('simFillAbord').style.width = (X2/max*100)+'%';
+  document.getElementById('simFillFecha').style.width = (Y2/max*100)+'%';
+  document.getElementById('simNumAbord').textContent = X2;
+  document.getElementById('simNumFecha').textContent = Y2;
+  const diff = Y2-Y;
+  const resEl = document.getElementById('simResult');
+  if(diff<=0){
+    resEl.innerHTML = `Esse é o seu ritmo hoje: <b>${X}</b> abordagens → <b>${Y}</b> vendas/dia. Arraste pra direita e veja o efeito de abordar mais gente, na sua conversão atual (<b>${fmtNum(conv,0)}%</b>).`;
+  } else {
+    resEl.innerHTML = `Abordando <b>${X2}</b> clientes/dia, no seu ritmo atual (${fmtNum(conv,0)}% de conversão), você fecha <b>${Y2}</b> vendas/dia — <span class="up">+${diff} vendas/dia</span>, ou <span class="up">+${diff*diasVenda} vendas no mês</span>.`;
+  }
+}
+
+/* ---------- Compartilhar no WhatsApp ---------- */
+async function compartilharResultado(){
+  const area = document.getElementById('shareArea');
+  const btn = document.getElementById('btnShare');
+  const original = btn.innerHTML;
+  btn.disabled = true; btn.textContent = 'Gerando imagem...';
+  const texto = `Minha meta na mão (${nomeMes}): preciso fechar ${state.Y} clientes/dia em ${state.diasVenda} dias de venda pra bater a meta. 💪 Time Ramsons`;
+  try{
+    const canvas = await html2canvas(area, {backgroundColor:'#F4F6FA', scale:2});
+    const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
+    const file = new File([blob], 'meta-na-mao-ramsons.png', {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Meta na Mão · Ramsons', text: texto});
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='meta-na-mao-ramsons.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+      window.open('https://wa.me/?text='+encodeURIComponent(texto+' (baixei a imagem aqui, só anexar no WhatsApp)'), '_blank');
+    }
+  }catch(e){
+    if(e && e.name==='AbortError'){ /* usuário cancelou o compartilhamento */ }
+    else window.open('https://wa.me/?text='+encodeURIComponent(texto), '_blank');
+  } finally {
+    btn.disabled=false; btn.innerHTML = original;
+  }
 }
 
 function buildStrategy(diaria, diasVenda, X, Y, conv, resolveDia, arCond){
