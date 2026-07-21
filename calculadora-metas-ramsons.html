@@ -57,6 +57,20 @@
   main{flex:1;padding:20px 16px 40px;max-width:560px;width:100%;margin:0 auto}
   .step{display:none;animation:rise .35s ease}
   .step.on{display:block}
+  .screen{display:none;animation:rise .35s ease}
+  .screen.on{display:block}
+  .logo{cursor:pointer}
+
+  /* MENU */
+  .menu-grid{display:grid;gap:14px;margin-top:6px}
+  .menu-card{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:20px;cursor:pointer;transition:.15s;font-family:inherit}
+  .menu-card:hover{border-color:var(--red);transform:translateY(-1px)}
+  .menu-card:active{transform:translateY(1px)}
+  .menu-ic{font-size:28px;margin-bottom:6px}
+  .menu-tit{font-family:'Poppins';font-weight:800;font-size:17px;color:var(--ink)}
+  .menu-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.4}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .step-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:4px}
   .step h2{font-size:21px;font-weight:700;margin-bottom:4px}
@@ -183,22 +197,40 @@
 
 <header class="top">
   <div class="brand">
-    <div class="logo">RAMSONS</div>
+    <div class="logo" onclick="showScreen('Menu')">RAMSONS</div>
   </div>
   <div class="headline">
-    <div class="eyebrow">Planejamento de metas</div>
-    <h1>Meta na Mão</h1>
-    <p>Descubra quanto você precisa vender por dia e por cliente para bater a meta do mês.</p>
+    <div class="eyebrow" id="hdrEyebrow">Ferramentas de venda</div>
+    <h1 id="hdrTitle">Escolha sua calculadora</h1>
+    <p id="hdrDesc">Tudo que você precisa pra fechar a venda, na palma da mão.</p>
   </div>
 </header>
 
-<div class="progress" id="progress">
+<div class="progress" id="progress" style="display:none">
   <div class="seg"><span></span></div>
   <div class="seg"><span></span></div>
   <div class="seg"><span></span></div>
 </div>
 
 <main>
+
+  <!-- MENU -->
+  <div class="screen on" id="screenMenu">
+    <div class="menu-grid">
+      <button class="menu-card" onclick="showScreen('Metas')">
+        <span class="menu-ic">🎯</span>
+        <span class="menu-tit">Calcular Metas</span>
+        <span class="menu-sub">Meta na Mão — planeje seu mês, dia e cliente</span>
+      </button>
+      <button class="menu-card" onclick="showScreen('Parcela')">
+        <span class="menu-ic">💳</span>
+        <span class="menu-tit">Calcular Parcela</span>
+        <span class="menu-sub">Crédito Ramsons / Cartão — mostre o valor por mês e feche o serviço agregado</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="screen" id="screenMetas">
 
   <!-- STEP 1 -->
   <section class="step on" data-step="1">
@@ -347,6 +379,80 @@
       <button class="btn btn-ghost" style="flex:1" onclick="window.print()">Salvar / imprimir</button>
     </div>
   </section>
+
+  </div>
+
+  <!-- CALCULAR PARCELA -->
+  <div class="screen" id="screenParcela">
+    <div class="card grid">
+      <div class="field">
+        <label>Método de pagamento</label>
+        <div class="chips" id="metodoChips">
+          <div class="chip sel" data-m="ramsons">Crédito<small>Ramsons</small></div>
+          <div class="chip" data-m="cartao">Cartão<small>de crédito</small></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><span class="dot" style="background:#DD2638"></span>Valor do produto<span class="kind">valor R$</span></label>
+        <div class="inp-wrap"><span class="pre">R$</span><input type="tel" inputmode="numeric" id="pcProduto" placeholder="0,00" autocomplete="off"></div>
+      </div>
+
+      <div class="field">
+        <label>Tipo de serviço agregado</label>
+        <div class="chips" id="pcTipoChips">
+          <div class="chip sel" data-t="garantia">Garantia<small>estendida</small></div>
+          <div class="chip" data-t="seguro">Seguro<small>Assurant</small></div>
+          <div class="chip" data-t="instalacao">Instal.<small>ar/TV</small></div>
+          <div class="chip" data-t="psd">PSD<small>digital</small></div>
+        </div>
+      </div>
+
+      <div class="field" id="pcDuracaoWrap">
+        <label>Duração extra da garantia</label>
+        <div class="chips" id="pcDuracaoChips">
+          <div class="chip sel" data-d="12">12<small>meses</small></div>
+          <div class="chip" data-d="24">24<small>meses</small></div>
+          <div class="chip" data-d="36">36<small>meses</small></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><span class="dot" style="background:#7A3FF2"></span>Valor do serviço agregado<span class="kind">valor R$</span></label>
+        <div class="inp-wrap"><span class="pre">R$</span><input type="tel" inputmode="numeric" id="pcServico" placeholder="0,00" autocomplete="off"></div>
+      </div>
+
+      <div class="field">
+        <label>Quantidade de parcelas</label>
+        <div class="inp-wrap qty"><input type="tel" inputmode="numeric" id="pcParcelas" placeholder="Ex: 10" maxlength="2"></div>
+      </div>
+    </div>
+    <div class="err" id="errParcela"></div>
+
+    <div id="pcResultado" style="display:none">
+      <div class="sec-h"><span class="bar"></span><h3>Fica assim no bolso do cliente</h3></div>
+      <div class="summary">
+        <div class="row">
+          <div class="box">
+            <div class="k">Parcela produto</div>
+            <div class="v" id="pcValProduto">R$ 0</div>
+          </div>
+          <div class="box">
+            <div class="k">Parcela serviço</div>
+            <div class="v" id="pcValServico">R$ 0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-h"><span class="bar"></span><h3>Frase pra fechar</h3></div>
+      <div class="resolve-box">
+        <div class="ic">💬</div>
+        <div><p id="pcFrase"></p></div>
+      </div>
+    </div>
+
+    <p class="clear-link" onclick="limparParcela()">🗑 Limpar esta simulação</p>
+  </div>
 
 </main>
 
@@ -764,6 +870,93 @@ function limparTudo(){
   document.getElementById('err3').textContent='';
 
   show(1);
+}
+
+/* ---------- Navegação entre telas (Menu / Metas / Parcela) ---------- */
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id==='screen'+name));
+  const headers = {
+    Menu:    {eyebrow:'Ferramentas de venda', title:'Escolha sua calculadora', desc:'Tudo que você precisa pra fechar a venda, na palma da mão.'},
+    Metas:   {eyebrow:'Planejamento de metas', title:'Meta na Mão', desc:'Descubra quanto você precisa vender por dia e por cliente para bater a meta do mês.'},
+    Parcela: {eyebrow:'Fechamento de venda', title:'Calcular Parcela', desc:'Mostre pro cliente quanto sai por mês — produto e serviço juntos.'}
+  };
+  const h = headers[name];
+  document.getElementById('hdrEyebrow').textContent = h.eyebrow;
+  document.getElementById('hdrTitle').textContent = h.title;
+  document.getElementById('hdrDesc').textContent = h.desc;
+  document.getElementById('progress').style.display = name==='Metas' ? 'flex' : 'none';
+  if(name==='Metas') paintProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- Calcular Parcela ---------- */
+function wireChips(containerId, onChange){
+  const els = document.querySelectorAll('#'+containerId+' .chip');
+  els.forEach(c=>c.addEventListener('click', ()=>{
+    els.forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel');
+    onChange && onChange();
+  }));
+}
+function toggleDuracaoWrap(){
+  const tipo = document.querySelector('#pcTipoChips .chip.sel').dataset.t;
+  document.getElementById('pcDuracaoWrap').style.display = tipo==='garantia' ? 'block' : 'none';
+}
+wireChips('metodoChips', calcularParcela);
+wireChips('pcTipoChips', ()=>{ toggleDuracaoWrap(); calcularParcela(); });
+wireChips('pcDuracaoChips', calcularParcela);
+toggleDuracaoWrap();
+
+document.getElementById('pcProduto').addEventListener('input', e=>{ maskBRL(e.target); calcularParcela(); });
+document.getElementById('pcServico').addEventListener('input', e=>{ maskBRL(e.target); calcularParcela(); });
+document.getElementById('pcParcelas').addEventListener('input', e=>{ maskInt(e.target); calcularParcela(); });
+
+function calcularParcela(){
+  const produto = parseFloat(document.getElementById('pcProduto').dataset.val||0);
+  const servico = parseFloat(document.getElementById('pcServico').dataset.val||0);
+  const parcelas = parseInt(document.getElementById('pcParcelas').dataset.val||0,10);
+  const err = document.getElementById('errParcela');
+  const resWrap = document.getElementById('pcResultado');
+
+  if(!produto || !servico || !parcelas){
+    resWrap.style.display='none';
+    err.textContent = '';
+    return;
+  }
+  err.textContent='';
+
+  const parcProduto = produto/parcelas;
+  const parcServico = servico/parcelas;
+  document.getElementById('pcValProduto').innerHTML = fmtBRL(parcProduto)+` <small>${parcelas}x</small>`;
+  document.getElementById('pcValServico').innerHTML = fmtBRL(parcServico)+` <small>${parcelas}x</small>`;
+
+  const tipo = document.querySelector('#pcTipoChips .chip.sel').dataset.t;
+  const metodo = document.querySelector('#metodoChips .chip.sel').dataset.m==='ramsons' ? 'Crédito Ramsons' : 'Cartão de crédito';
+  let frase='';
+  if(tipo==='garantia'){
+    const dur = document.querySelector('#pcDuracaoChips .chip.sel').dataset.d;
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, seu produto fica com <b>Garantia Extra por mais ${dur} meses</b>."`;
+  } else if(tipo==='seguro'){
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, seu produto fica <b>protegido com o Seguro Assurant</b>."`;
+  } else if(tipo==='instalacao'){
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, a <b>instalação já sai garantida</b>, sem dor de cabeça."`;
+  } else {
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, seu produto sai com <b>Pit Stop Digital</b>."`;
+  }
+  document.getElementById('pcFrase').innerHTML = frase;
+  resWrap.style.display='block';
+}
+
+function limparParcela(){
+  const pr=document.getElementById('pcProduto'); pr.value=''; pr.dataset.val=0;
+  const sv=document.getElementById('pcServico'); sv.value=''; sv.dataset.val=0;
+  const pa=document.getElementById('pcParcelas'); pa.value=''; pa.dataset.val=0;
+  document.querySelectorAll('#metodoChips .chip').forEach((c,i)=>c.classList.toggle('sel', i===0));
+  document.querySelectorAll('#pcTipoChips .chip').forEach((c,i)=>c.classList.toggle('sel', i===0));
+  document.querySelectorAll('#pcDuracaoChips .chip').forEach((c,i)=>c.classList.toggle('sel', i===0));
+  toggleDuracaoWrap();
+  document.getElementById('pcResultado').style.display='none';
+  document.getElementById('errParcela').textContent='';
 }
 
 load();
