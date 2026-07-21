@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Meta na Mão · Ramsons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#DD2638;
+    --red-deep:#B3162A;
+    --gold:#FECE48;
+    --gold-soft:#FFF0BE;
+    --navy:#141B2E;
+    --navy-2:#1E2843;
+    --ink:#1C2333;
+    --muted:#6A7488;
+    --line:#E7EAF0;
+    --cloud:#F4F6FA;
+    --white:#FFFFFF;
+    --ok:#1E9E6A;
+    --warn:#E08A00;
+    --shadow:0 10px 30px rgba(20,27,46,.10);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--cloud);color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  body{min-height:100dvh;display:flex;flex-direction:column}
+  h1,h2,h3,.num{font-family:'Poppins','Inter',sans-serif}
+
+  /* HEADER */
+  .top{
+    background:linear-gradient(135deg,var(--red) 0%,var(--red-deep) 100%);
+    color:#fff;padding:18px 20px calc(20px + env(safe-area-inset-top)) 20px;
+    padding-top:calc(18px + env(safe-area-inset-top));
+    position:relative;overflow:hidden;
+  }
+  .top::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;
+    background:radial-gradient(circle,rgba(254,206,72,.30),transparent 65%);}
+  .brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+  .logo{font-family:'Poppins';font-weight:800;font-size:22px;letter-spacing:.5px;color:#fff}
+  .headline{position:relative;z-index:1;margin-top:14px}
+  .headline .eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+  .headline h1{font-size:24px;font-weight:800;line-height:1.15;margin-top:4px}
+  .headline p{font-size:13px;color:#FBDADE;margin-top:6px;max-width:34ch}
+
+  /* PROGRESS */
+  .progress{display:flex;gap:6px;padding:16px 20px 0}
+  .progress .seg{flex:1;height:5px;border-radius:99px;background:var(--line);overflow:hidden}
+  .progress .seg span{display:block;height:100%;width:0;background:var(--red);border-radius:99px;transition:width .35s ease}
+  .progress .seg.done span{width:100%}
+  .progress .seg.active span{width:50%}
+
+  /* LAYOUT */
+  main{flex:1;padding:20px 16px 40px;max-width:560px;width:100%;margin:0 auto}
+  .step{display:none;animation:rise .35s ease}
+  .step.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .step-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:4px}
+  .step h2{font-size:21px;font-weight:700;margin-bottom:4px}
+  .step .lead{font-size:14px;color:var(--muted);margin-bottom:20px}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  .grid{display:grid;gap:12px}
+
+  /* FIELDS */
+  .field{position:relative}
+  .field label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px}
+  .field label .dot{width:9px;height:9px;border-radius:50%;background:var(--gold)}
+  .field label .kind{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);background:var(--cloud);padding:2px 7px;border-radius:99px}
+  .inp-wrap{position:relative;display:flex;align-items:center}
+  .inp-wrap .pre{position:absolute;left:14px;font-weight:700;color:var(--muted);font-size:15px;pointer-events:none}
+  input[type=text],input[type=tel]{
+    width:100%;font-family:'Poppins';font-size:18px;font-weight:600;color:var(--ink);
+    background:var(--cloud);border:2px solid transparent;border-radius:12px;
+    padding:14px 14px 14px 42px;outline:none;transition:border-color .2s,background .2s;
+  }
+  .inp-wrap.qty input{padding-left:14px}
+  input:focus{border-color:var(--red);background:#fff}
+  input::placeholder{color:#AEB6C6;font-weight:500}
+
+  /* CHIPS (folgas) */
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{flex:1;min-width:64px;text-align:center;padding:16px 10px;border-radius:14px;border:2px solid var(--line);
+    background:#fff;font-family:'Poppins';font-weight:700;font-size:20px;cursor:pointer;transition:.15s;user-select:none;color:var(--ink)}
+  .chip small{display:block;font-family:'Inter';font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+  .chip:hover{border-color:var(--gold)}
+  .chip.sel{border-color:var(--red);background:linear-gradient(135deg,var(--red),var(--red-deep));color:#fff}
+  .chip.sel small{color:var(--gold-soft)}
+  .chip.other{font-size:15px}
+  #folgaOtherWrap{margin-top:12px;display:none}
+  #folgaOtherWrap.on{display:block}
+
+  /* BUTTONS */
+  .nav{display:flex;gap:10px;margin-top:22px}
+  .btn{flex:1;border:none;border-radius:14px;padding:15px;font-family:'Poppins';font-weight:700;font-size:15px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-primary{background:linear-gradient(135deg,var(--red),var(--red-deep));color:#fff;box-shadow:0 8px 18px rgba(221,38,56,.30)}
+  .btn-primary:active{transform:translateY(1px)}
+  .btn-ghost{background:#fff;border:2px solid var(--line);color:var(--ink);flex:0 0 auto;padding:15px 18px}
+  .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+  .err{color:var(--red);font-size:12.5px;font-weight:600;margin-top:10px;min-height:16px}
+
+  /* RESULTS */
+  .summary{background:linear-gradient(135deg,var(--red),var(--red-deep));color:#fff;border-radius:var(--radius);padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+  .summary::after{content:"";position:absolute;left:-30px;bottom:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(254,206,72,.30),transparent 60%)}
+  .summary .row{display:flex;gap:14px;position:relative;z-index:1}
+  .summary .box{flex:1}
+  .summary .box .k{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#FBD5D9;font-weight:600}
+  .summary .box .v{font-family:'Poppins';font-weight:800;font-size:26px;line-height:1.1;margin-top:3px}
+  .summary .box .v small{font-size:13px;font-weight:600;color:var(--gold)}
+
+  .sec-h{display:flex;align-items:center;gap:10px;margin:26px 4px 12px}
+  .sec-h .bar{width:4px;height:18px;border-radius:99px;background:var(--red)}
+  .sec-h h3{font-size:16px;font-weight:700}
+  .sec-h .hint{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600}
+
+  .metas{display:grid;gap:10px}
+  .meta-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+  .meta-row .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-family:'Poppins';font-weight:800;font-size:14px;color:#fff;flex:0 0 auto}
+  .meta-row .name{font-weight:600;font-size:14px}
+  .meta-row .name span{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
+  .meta-row .vals{margin-left:auto;text-align:right}
+  .meta-row .vals .day{font-family:'Poppins';font-weight:800;font-size:16px;color:var(--ink)}
+  .meta-row .vals .per{font-size:11px;color:var(--red);font-weight:700;margin-top:1px}
+
+  .gauge-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 18px;text-align:center}
+  .gauge-card .big{font-family:'Poppins';font-weight:800;font-size:40px;line-height:1}
+  .gauge-card .lbl{font-size:13px;color:var(--muted);font-weight:600;margin-top:2px}
+  .gauge-card .verdict{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:99px}
+
+  .strategy{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px 0;overflow:hidden}
+  .strat-item{display:flex;gap:13px;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .strat-item:last-child{border-bottom:none}
+  .strat-item .n{width:26px;height:26px;border-radius:8px;background:var(--gold);color:var(--navy);font-family:'Poppins';font-weight:800;font-size:13px;display:grid;place-items:center;flex:0 0 auto}
+  .strat-item .txt{font-size:13.5px;line-height:1.5;color:var(--ink)}
+  .strat-item .txt b{color:var(--red)}
+  .strat-item .txt strong{color:var(--navy)}
+
+  .resolve-box{background:linear-gradient(135deg,#FFF7DE,#FFF0BE);border:1px solid #F3D97A;border-radius:var(--radius);padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+  .resolve-box .ic{width:40px;height:40px;border-radius:10px;background:var(--red);color:var(--gold);display:grid;place-items:center;font-family:'Poppins';font-weight:800;flex:0 0 auto}
+  .resolve-box h4{font-size:14px;font-weight:700;color:var(--navy)}
+  .resolve-box p{font-size:13px;color:#5A5223;margin-top:4px;line-height:1.5}
+  .resolve-box b{color:var(--red)}
+
+  .foot-note{text-align:center;font-size:11.5px;color:var(--muted);margin-top:22px;line-height:1.5}
+  .foot-note b{color:var(--navy)}
+
+  @media(min-width:600px){
+    .headline h1{font-size:28px}
+    main{padding:26px 20px 50px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo">RAMSONS</div>
+  </div>
+  <div class="headline">
+    <div class="eyebrow">Planejamento de metas</div>
+    <h1>Meta na Mão</h1>
+    <p>Descubra quanto você precisa vender por dia e por cliente para bater a meta do mês.</p>
+  </div>
+</header>
+
+<div class="progress" id="progress">
+  <div class="seg"><span></span></div>
+  <div class="seg"><span></span></div>
+  <div class="seg"><span></span></div>
+</div>
+
+<main>
+
+  <!-- STEP 1 -->
+  <section class="step on" data-step="1">
+    <div class="step-title">Passo 1 de 3</div>
+    <h2>Metas do mês</h2>
+    <p class="lead">Digite a meta mensal de cada produto para <b id="mesNome1">este mês</b>.</p>
+
+    <div class="card grid" id="metaFields"></div>
+    <div class="err" id="err1"></div>
+
+    <div class="nav">
+      <button class="btn btn-primary" onclick="go(2)">Continuar</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step" data-step="2">
+    <div class="step-title">Passo 2 de 3</div>
+    <h2>Suas folgas</h2>
+    <p class="lead">Quantas folgas você vai tirar em <b id="mesNome2">no mês</b>? Isso define seus dias de venda.</p>
+
+    <div class="card">
+      <div class="chips" id="folgaChips">
+        <div class="chip" data-f="4">4<small>folgas</small></div>
+        <div class="chip" data-f="5">5<small>folgas</small></div>
+        <div class="chip" data-f="6">6<small>folgas</small></div>
+        <div class="chip other" data-f="other">Outro<small>digitar</small></div>
+      </div>
+      <div id="folgaOtherWrap" class="field">
+        <label>Quantas folgas?</label>
+        <div class="inp-wrap qty">
+          <input type="tel" id="folgaOther" inputmode="numeric" placeholder="Ex: 7" maxlength="2">
+        </div>
+      </div>
+    </div>
+    <div class="err" id="err2"></div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="go(1)">Voltar</button>
+      <button class="btn btn-primary" onclick="go(3)">Continuar</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step" data-step="3">
+    <div class="step-title">Passo 3 de 3</div>
+    <h2>Seu atendimento</h2>
+    <p class="lead">Agora seu ritmo no salão, para calcular a meta por cliente.</p>
+
+    <div class="card grid">
+      <div class="field">
+        <label><span class="dot"></span>Clientes que você aborda por dia<span class="kind">quantidade</span></label>
+        <div class="inp-wrap qty">
+          <input type="tel" id="abordados" inputmode="numeric" placeholder="Ex: 20" maxlength="3">
+        </div>
+      </div>
+      <div class="field">
+        <label><span class="dot"></span>Clientes que você fecha venda por dia<span class="kind">quantidade</span></label>
+        <div class="inp-wrap qty">
+          <input type="tel" id="efetivados" inputmode="numeric" placeholder="Ex: 8" maxlength="3">
+        </div>
+      </div>
+    </div>
+    <div class="err" id="err3"></div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="go(2)">Voltar</button>
+      <button class="btn btn-primary" onclick="calcular()">Calcular meta ⚡</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="step" data-step="4">
+    <div class="step-title" id="mesNome4">Seu plano do mês</div>
+    <h2>Meta na mão 🎯</h2>
+    <p class="lead" id="resLead"></p>
+
+    <div class="summary">
+      <div class="row">
+        <div class="box">
+          <div class="k">Dias de venda</div>
+          <div class="v" id="rDias">0</div>
+        </div>
+        <div class="box">
+          <div class="k">Clientes/dia p/ bater</div>
+          <div class="v" id="rClientes">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-h"><span class="bar"></span><h3>Meta diária</h3><span class="hint">dia · por cliente</span></div>
+    <div class="metas" id="rMetas"></div>
+
+    <div class="sec-h"><span class="bar"></span><h3>Sua conversão</h3></div>
+    <div class="gauge-card">
+      <div id="gauge"></div>
+      <div class="big" id="rConv">0%</div>
+      <div class="lbl">de cada cliente abordado vira venda</div>
+      <div class="verdict" id="rVerdict"></div>
+    </div>
+
+    <div class="sec-h"><span class="bar"></span><h3>Meta Resolve (instalação)</h3></div>
+    <div class="resolve-box">
+      <div class="ic">AC</div>
+      <div>
+        <h4>Regra 4 pra 1</h4>
+        <p id="rResolve"></p>
+      </div>
+    </div>
+
+    <div class="sec-h"><span class="bar"></span><h3>Plano de ataque</h3></div>
+    <div class="strategy" id="rStrategy"></div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="go(1)">Refazer</button>
+      <button class="btn btn-primary" onclick="window.print()">Salvar / imprimir</button>
+    </div>
+
+    <p class="foot-note">Números redondos são metas de esforço, não promessa fechada.<br><b>Time Ramsons</b></p>
+  </section>
+
+</main>
+
+<script>
+/* ---------- Config das metas ---------- */
+const PRODUTOS = [
+  {id:'produtos', nome:'Produtos',   sub:'Faturamento geral',      tipo:'money', cor:'#DD2638', ini:'PR'},
+  {id:'credito',  nome:'Crédito',    sub:'Carnê / financiamento',  tipo:'money', cor:'#1E2843', ini:'CR'},
+  {id:'garantia', nome:'Garantia',   sub:'Garantia estendida',     tipo:'money', cor:'#E08A00', ini:'GA'},
+  {id:'seguro',   nome:'Seguro',     sub:'Seguros Assurant',       tipo:'money', cor:'#1E9E6A', ini:'SG'},
+  {id:'resolve',  nome:'Resolve',    sub:'Instalação de ar (qtd)', tipo:'qty',   cor:'#7A3FF2', ini:'RS'},
+  {id:'psd',      nome:'PSD',        sub:'Pit Stop Digital',       tipo:'money', cor:'#0E8FD6', ini:'PS'},
+  {id:'instaltv', nome:'Instal TV',  sub:'Instalação de TV',       tipo:'money', cor:'#C43B7A', ini:'TV'},
+];
+
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const hoje = new Date();
+const diasNoMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0).getDate();
+const nomeMes = MESES[hoje.getMonth()];
+document.getElementById('mesNome1').textContent = nomeMes;
+document.getElementById('mesNome2').textContent = nomeMes;
+
+/* ---------- Estado ---------- */
+const state = {metas:{}, folgas:null, abordados:0, efetivados:0};
+
+/* ---------- Máscara BRL (centavos) ---------- */
+function maskBRL(el){
+  let d = el.value.replace(/\D/g,'');
+  if(!d){el.value='';el.dataset.val=0;return;}
+  d = d.replace(/^0+/,'') || '0';
+  const n = parseInt(d,10)/100;
+  el.dataset.val = n;
+  el.value = n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function maskInt(el){
+  let d = el.value.replace(/\D/g,'');
+  el.value = d;
+  el.dataset.val = d ? parseInt(d,10) : 0;
+}
+const fmtBRL = n => 'R$ '+Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtBRL0 = n => 'R$ '+Number(n).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtNum = (n,d=1) => Number(n).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:d});
+
+/* ---------- Monta campos do passo 1 ---------- */
+const wrap = document.getElementById('metaFields');
+PRODUTOS.forEach(p=>{
+  const f = document.createElement('div');
+  f.className='field';
+  const isMoney = p.tipo==='money';
+  f.innerHTML = `
+    <label><span class="dot" style="background:${p.cor}"></span>${p.nome}
+      <span class="kind">${isMoney?'valor R$':'quantidade'}</span></label>
+    <div class="inp-wrap ${isMoney?'':'qty'}">
+      ${isMoney?'<span class="pre">R$</span>':''}
+      <input type="tel" inputmode="numeric" id="m_${p.id}" placeholder="${isMoney?'0,00':'0'}" autocomplete="off">
+    </div>`;
+  wrap.appendChild(f);
+  const inp = f.querySelector('input');
+  inp.addEventListener('input', ()=> isMoney ? maskBRL(inp) : maskInt(inp));
+});
+
+/* ---------- Chips de folga ---------- */
+const chips = document.querySelectorAll('#folgaChips .chip');
+const otherWrap = document.getElementById('folgaOtherWrap');
+const otherInp = document.getElementById('folgaOther');
+chips.forEach(c=>{
+  c.addEventListener('click', ()=>{
+    chips.forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel');
+    if(c.dataset.f==='other'){
+      otherWrap.classList.add('on'); otherInp.focus(); state.folgas=null;
+    }else{
+      otherWrap.classList.remove('on'); state.folgas=parseInt(c.dataset.f,10);
+    }
+  });
+});
+otherInp.addEventListener('input', ()=>{ otherInp.value=otherInp.value.replace(/\D/g,''); state.folgas = otherInp.value?parseInt(otherInp.value,10):null; });
+
+/* ---------- Navegação ---------- */
+let current = 1;
+function paintProgress(){
+  const segs = document.querySelectorAll('#progress .seg');
+  segs.forEach((s,i)=>{
+    s.classList.remove('done','active');
+    const step = i+1;
+    if(current>step || current===4) s.classList.add('done');
+    else if(current===step) s.classList.add('active');
+  });
+}
+function show(step){
+  document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on', +s.dataset.step===step));
+  current=step; paintProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(step){
+  if(step===2){ if(!validar1())return; }
+  if(step===3){ if(!validar2())return; }
+  if(step===1){ show(1); return; }
+  show(step);
+  save();
+}
+
+/* ---------- Validações ---------- */
+function validar1(){
+  const err=document.getElementById('err1');
+  let ok=false;
+  PRODUTOS.forEach(p=>{
+    const v = parseFloat(document.getElementById('m_'+p.id).dataset.val||0);
+    state.metas[p.id]=v;
+    if(v>0) ok=true;
+  });
+  if(!ok){err.textContent='Preencha ao menos uma meta para continuar.';return false;}
+  err.textContent=''; return true;
+}
+function validar2(){
+  const err=document.getElementById('err2');
+  if(!state.folgas && state.folgas!==0){err.textContent='Escolha ou digite suas folgas.';return false;}
+  if(state.folgas>=diasNoMes){err.textContent='As folgas precisam ser menores que os '+diasNoMes+' dias do mês.';return false;}
+  err.textContent=''; return true;
+}
+function validar3(){
+  const err=document.getElementById('err3');
+  const a=parseInt(document.getElementById('abordados').dataset.val||0);
+  const e=parseInt(document.getElementById('efetivados').dataset.val||0);
+  state.abordados=a; state.efetivados=e;
+  if(!a){err.textContent='Informe quantos clientes você aborda por dia.';return false;}
+  if(!e){err.textContent='Informe quantos clientes você fecha por dia.';return false;}
+  if(e>a){err.textContent='Fechamentos não podem ser maiores que abordagens.';return false;}
+  err.textContent=''; return true;
+}
+
+/* ---------- Cálculo ---------- */
+function calcular(){
+  if(!validar3())return;
+  save();
+  const diasVenda = diasNoMes - state.folgas;
+  const Y = state.efetivados, X = state.abordados;
+  const conv = (Y/X)*100;
+
+  document.getElementById('rDias').innerHTML = diasVenda+' <small>dias</small>';
+  document.getElementById('rClientes').innerHTML = Y+' <small>clientes</small>';
+  document.getElementById('resLead').innerHTML =
+    `Você tem <b>${diasVenda} dias de venda</b> em ${nomeMes}. Veja o que precisa sair por dia e por cliente.`;
+  document.getElementById('mesNome4').textContent = 'Seu plano de '+nomeMes;
+
+  /* Meta diária + por cliente */
+  const cont = document.getElementById('rMetas'); cont.innerHTML='';
+  const diaria = {};
+  PRODUTOS.forEach(p=>{
+    const mensal = state.metas[p.id]||0;
+    const dia = mensal/diasVenda;
+    diaria[p.id]=dia;
+    if(mensal<=0) return;
+    const isMoney = p.tipo==='money';
+    const perCli = dia/Y;
+    const row=document.createElement('div'); row.className='meta-row';
+    let valDia = isMoney? fmtBRL(dia) : fmtNum(dia,1)+' un';
+    let valCli = isMoney? fmtBRL(perCli)+' / cliente' : fmtNum(perCli,2)+' un / cliente';
+    row.innerHTML=`
+      <div class="ic" style="background:${p.cor}">${p.ini}</div>
+      <div class="name">${p.nome}<span>${p.sub}</span></div>
+      <div class="vals"><div class="day">${valDia}</div><div class="per">${valCli}</div></div>`;
+    cont.appendChild(row);
+  });
+
+  /* Conversão + gauge */
+  document.getElementById('rConv').textContent = fmtNum(conv,0)+'%';
+  drawGauge(conv);
+  const vd=document.getElementById('rVerdict');
+  if(conv>=40){vd.textContent='Conversão forte 🔥';vd.style.background='#E4F6EC';vd.style.color=vd_c='#1E9E6A';}
+  else if(conv>=25){vd.textContent='Boa, dá pra subir 👍';vd.style.background='#FFF3D6';vd.style.color='#B37700';}
+  else {vd.textContent='Foco em fechar mais 🎯';vd.style.background='#FDE3E6';vd.style.color='#B3162A';}
+
+  /* Resolve */
+  const resolveDia = diaria['resolve']||0;
+  const arCond = resolveDia*4;
+  const resEl=document.getElementById('rResolve');
+  if(resolveDia>0){
+    resEl.innerHTML = `A cada <b>4 ares vendidos, 1 sai com instalação</b> (25% de conversão). Para bater a meta você precisa de <b>${fmtNum(resolveDia,1)} instalação(ões) por dia</b>, ou seja, vender cerca de <b>${fmtNum(arCond,1)} ares por dia</b> oferecendo a instalação em todos.`;
+  } else {
+    resEl.innerHTML = `Sem meta de Resolve definida neste mês. Mesmo assim, ofereça instalação em <b>1 a cada 4 ares</b> que vender.`;
+  }
+
+  /* Plano de ataque */
+  buildStrategy(diaria, diasVenda, X, Y, conv, resolveDia, arCond);
+
+  show(4);
+}
+
+function buildStrategy(diaria, diasVenda, X, Y, conv, resolveDia, arCond){
+  const s=[];
+  const prodCli = (diaria['produtos']||0)/Y;
+
+  s.push(`Sua meta de faturamento por cliente que fecha é de <strong>${fmtBRL0(prodCli)}</strong>. Antes de fechar, sempre puxe um item a mais para chegar nesse ticket.`);
+
+  // Crédito / anexos
+  const anexos = ['credito','garantia','seguro','psd'].filter(id=>(diaria[id]||0)>0);
+  if(anexos.length){
+    const nomes = anexos.map(id=>PRODUTOS.find(p=>p.id===id).nome).join(', ');
+    s.push(`Trabalhe <b>${nomes}</b> como venda cruzada dentro do atendimento. Cada produto tem meta por cliente na tabela acima, use como checklist antes de finalizar.`);
+  }
+
+  // Conversão
+  if(conv < 25){
+    const alvo = Math.ceil(X*0.30);
+    s.push(`Sua conversão está em <strong>${fmtNum(conv,0)}%</strong>. Subindo para 30% você fecharia <b>${alvo} clientes/dia</b> sem abordar ninguém a mais. Capriche na sondagem e na oferta de valor.`);
+  } else {
+    const extra = Math.ceil(Y*0.15);
+    s.push(`Boa conversão. Para acelerar, aborde mais gente: cada <b>+${Math.ceil(X*0.15)} clientes/dia</b> viram cerca de <b>+${extra} vendas/dia</b> no seu ritmo atual.`);
+  }
+
+  // Resolve
+  if(resolveDia>0){
+    s.push(`Resolve: ofereça instalação em <b>todo ar vendido</b>. Meta de <b>${fmtNum(resolveDia,1)} instalação(ões)/dia</b> equivale a fechar a venda cruzada em 1 de cada 4 ares.`);
+  }
+
+  // Fechamento motivacional prático
+  s.push(`Todo início de dia, olhe estes números e escolha <strong>2 produtos foco</strong>. Meta batida é soma de dia batido. <b>Simples assim.</b>`);
+
+  const cont=document.getElementById('rStrategy'); cont.innerHTML='';
+  s.forEach((t,i)=>{
+    const d=document.createElement('div'); d.className='strat-item';
+    d.innerHTML=`<div class="n">${i+1}</div><div class="txt">${t}</div>`;
+    cont.appendChild(d);
+  });
+}
+
+/* ---------- Gauge SVG ---------- */
+function drawGauge(pct){
+  pct=Math.max(0,Math.min(100,pct));
+  const w=200,h=110,cx=100,cy=100,r=80;
+  const ang=Math.PI*(1-pct/100);
+  const nx=cx+r*Math.cos(ang), ny=cy-r*Math.sin(ang);
+  const arc=(from,to,col,sw)=>{
+    const a0=Math.PI*(1-from/100), a1=Math.PI*(1-to/100);
+    const x0=cx+r*Math.cos(a0),y0=cy-r*Math.sin(a0);
+    const x1=cx+r*Math.cos(a1),y1=cy-r*Math.sin(a1);
+    return `<path d="M${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}" stroke="${col}" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+  };
+  document.getElementById('gauge').innerHTML=`
+  <svg viewBox="0 0 ${w} ${h}" style="width:200px;max-width:100%;height:auto">
+    ${arc(0,100,'#EDEFF4',14)}
+    ${arc(0,pct,'#DD2638',14)}
+    <circle cx="${nx}" cy="${ny}" r="7" fill="#141B2E"/>
+    <circle cx="${nx}" cy="${ny}" r="3" fill="#FECE48"/>
+  </svg>`;
+}
+
+/* ---------- Persistência local (opcional) ---------- */
+function save(){
+  try{
+    localStorage.setItem('ramsons_metas', JSON.stringify({
+      metas:state.metas, folgas:state.folgas,
+      abordados:state.abordados, efetivados:state.efetivados
+    }));
+  }catch(e){}
+}
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem('ramsons_metas')||'null');
+    if(!d)return;
+    PRODUTOS.forEach(p=>{
+      const v=d.metas?.[p.id]; if(!v)return;
+      const el=document.getElementById('m_'+p.id);
+      el.dataset.val=v;
+      el.value = p.tipo==='money'
+        ? Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
+        : v;
+    });
+    if(d.folgas!=null){
+      const chip=[...chips].find(c=>c.dataset.f==String(d.folgas));
+      if(chip){chip.classList.add('sel');state.folgas=d.folgas;}
+      else{[...chips].find(c=>c.dataset.f==='other').classList.add('sel');otherWrap.classList.add('on');otherInp.value=d.folgas;state.folgas=d.folgas;}
+    }
+    if(d.abordados){const e=document.getElementById('abordados');e.value=d.abordados;e.dataset.val=d.abordados;}
+    if(d.efetivados){const e=document.getElementById('efetivados');e.value=d.efetivados;e.dataset.val=d.efetivados;}
+  }catch(e){}
+}
+document.getElementById('abordados').addEventListener('input',e=>maskInt(e.target));
+document.getElementById('efetivados').addEventListener('input',e=>maskInt(e.target));
+load();
+paintProgress();
+</script>
+</body>
+</html>
