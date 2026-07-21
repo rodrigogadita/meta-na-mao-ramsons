@@ -33,18 +33,16 @@
   /* HEADER */
   .top{
     background:linear-gradient(135deg,var(--red) 0%,var(--red-deep) 100%);
-    color:#fff;padding:18px 20px calc(20px + env(safe-area-inset-top)) 20px;
-    padding-top:calc(18px + env(safe-area-inset-top));
+    color:#fff;padding:14px 20px calc(16px + env(safe-area-inset-top)) 20px;
+    padding-top:calc(14px + env(safe-area-inset-top));
     position:relative;overflow:hidden;
   }
   .top::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;
     background:radial-gradient(circle,rgba(254,206,72,.30),transparent 65%);}
   .brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
-  .logo{font-family:'Poppins';font-weight:800;font-size:22px;letter-spacing:.5px;color:#fff}
-  .headline{position:relative;z-index:1;margin-top:14px}
-  .headline .eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
-  .headline h1{font-size:24px;font-weight:800;line-height:1.15;margin-top:4px}
-  .headline p{font-size:13px;color:#FBDADE;margin-top:6px;max-width:34ch}
+  .logo{font-family:'Poppins';font-weight:800;font-size:18px;letter-spacing:.5px;color:#fff;cursor:pointer}
+  .hdr-title{position:relative;z-index:1;font-family:'Poppins';font-weight:800;font-size:19px;
+    line-height:1.25;margin-top:6px}
 
   /* PROGRESS */
   .progress{display:flex;gap:6px;padding:16px 20px 0}
@@ -72,10 +70,10 @@
   .menu-tit{font-family:'Poppins';font-weight:800;font-size:17px;color:var(--ink)}
   .menu-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.4}
 
-  /* DEEP LINK */
-  .deep-link{display:inline-block;font-size:11.5px;color:var(--muted);font-weight:600;
+  /* VOLTAR AO INÍCIO */
+  .home-link{display:inline-block;font-size:12px;color:var(--muted);font-weight:700;
     background:var(--cloud);border:1px solid var(--line);border-radius:99px;padding:7px 14px;margin-bottom:16px;cursor:pointer}
-  .deep-link:hover{border-color:var(--red);color:var(--red)}
+  .home-link:hover{border-color:var(--red);color:var(--red)}
 
   /* TABELA EFICIÊNCIA */
   .eff-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;overflow-x:auto}
@@ -221,7 +219,7 @@
   .btn-whats{background:linear-gradient(135deg,#25D366,#1DA851);color:#fff;box-shadow:0 8px 18px rgba(37,211,102,.30)}
 
   @media(min-width:600px){
-    .headline h1{font-size:28px}
+    .hdr-title{font-size:22px}
     main{padding:26px 20px 50px}
   }
 </style>
@@ -232,11 +230,7 @@
   <div class="brand">
     <div class="logo" onclick="showScreen('Menu')">RAMSONS</div>
   </div>
-  <div class="headline">
-    <div class="eyebrow" id="hdrEyebrow">Ferramentas de venda</div>
-    <h1 id="hdrTitle">Escolha sua calculadora</h1>
-    <p id="hdrDesc">Tudo que você precisa pra fechar a venda, na palma da mão.</p>
-  </div>
+  <h1 class="hdr-title" id="hdrTitle">Escolha sua calculadora</h1>
 </header>
 
 <div class="progress" id="progress" style="display:none">
@@ -269,7 +263,7 @@
   </div>
 
   <div class="screen" id="screenMetas">
-  <div class="deep-link" onclick="copiarLink('metas', this)">🔗 Copiar link direto desta calculadora</div>
+  <div class="home-link" onclick="showScreen('Menu')">← Início</div>
 
   <!-- STEP 1 -->
   <section class="step on" data-step="1">
@@ -424,7 +418,7 @@
 
   <!-- CALCULAR PARCELA -->
   <div class="screen" id="screenParcela">
-    <div class="deep-link" onclick="copiarLink('parcela', this)">🔗 Copiar link direto desta calculadora</div>
+    <div class="home-link" onclick="showScreen('Menu')">← Início</div>
     <div class="card grid">
       <div class="field">
         <label>Método de pagamento</label>
@@ -494,7 +488,7 @@
 
   <!-- CALCULAR EFICIÊNCIA -->
   <div class="screen" id="screenEficiencia">
-    <div class="deep-link" onclick="copiarLink('eficiencia', this)">🔗 Copiar link direto desta calculadora</div>
+    <div class="home-link" onclick="showScreen('Menu')">← Início</div>
     <div class="card grid">
       <div class="field">
         <label><span class="dot" style="background:#DD2638"></span>Valor do produto<span class="kind">valor R$</span></label>
@@ -963,16 +957,13 @@ function limparTudo(){
 const SLUGS = {metas:'Metas', parcela:'Parcela', eficiencia:'Eficiencia'};
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id==='screen'+name));
-  const headers = {
-    Menu:       {eyebrow:'Ferramentas de venda', title:'Escolha sua calculadora', desc:'Tudo que você precisa pra fechar a venda, na palma da mão.'},
-    Metas:      {eyebrow:'Planejamento de metas', title:'Meta na Mão', desc:'Descubra quanto você precisa vender por dia e por cliente para bater a meta do mês.'},
-    Parcela:    {eyebrow:'Fechamento de venda', title:'Calcular Parcela', desc:'Mostre pro cliente quanto sai por mês — produto e serviço juntos.'},
-    Eficiencia: {eyebrow:'Fechamento de venda', title:'Calcular Eficiência', desc:'Seguro ÷ Produto × 100 — veja seu nível e o potencial de venda.'}
+  const titles = {
+    Menu:       'Escolha sua calculadora',
+    Metas:      'Meta na Mão',
+    Parcela:    'Calcular Parcela',
+    Eficiencia: 'Calcular Eficiência'
   };
-  const h = headers[name];
-  document.getElementById('hdrEyebrow').textContent = h.eyebrow;
-  document.getElementById('hdrTitle').textContent = h.title;
-  document.getElementById('hdrDesc').textContent = h.desc;
+  document.getElementById('hdrTitle').textContent = titles[name];
   document.getElementById('progress').style.display = name==='Metas' ? 'flex' : 'none';
   if(name==='Metas') paintProgress();
 
@@ -980,16 +971,6 @@ function showScreen(name){
   history.replaceState(null, '', slug ? '#'+slug : location.pathname+location.search);
 
   window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ---------- Link direto por calculadora ---------- */
-function copiarLink(slug, el){
-  const url = location.origin + location.pathname + '#' + slug;
-  const original = el.textContent;
-  const marcarCopiado = ()=>{ el.textContent='✅ Link copiado!'; setTimeout(()=>el.textContent=original, 1500); };
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(marcarCopiado).catch(()=>{});
-  }
 }
 
 /* ---------- Calcular Parcela ---------- */
