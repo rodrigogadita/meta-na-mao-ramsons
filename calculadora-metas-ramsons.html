@@ -299,40 +299,42 @@
         <div class="verdict" id="rVerdict"></div>
       </div>
 
-      <div class="sec-h"><span class="bar"></span><h3>E se você abordasse mais?</h3><span class="hint">arraste o número</span></div>
-      <div class="card sim-card">
-        <div class="sim-funil">
-          <div class="sim-stage abord">
-            <div class="bar-track"><div class="bar-fill" id="simFillAbord" style="width:0%"></div></div>
-            <span class="sim-num" id="simNumAbord">0</span>
-            <span class="sim-lbl">abordados/dia</span>
-          </div>
-          <div class="sim-arrow">→</div>
-          <div class="sim-stage fecha">
-            <div class="bar-track"><div class="bar-fill" id="simFillFecha" style="width:0%"></div></div>
-            <span class="sim-num" id="simNumFecha">0</span>
-            <span class="sim-lbl">vendas/dia</span>
-          </div>
-        </div>
-        <input type="range" class="sim-range" id="simRange" min="0" max="0" value="0" step="1">
-        <div class="sim-range-lbl"><span id="simMinLbl">hoje</span><span id="simMaxLbl">+30</span></div>
-        <div class="sim-result" id="simResult"></div>
-      </div>
-
-      <div class="sec-h"><span class="bar"></span><h3>Meta Resolve (instalação)</h3></div>
-      <div class="resolve-box">
-        <div class="ic">AC</div>
-        <div>
-          <h4>Regra 4 pra 1</h4>
-          <p id="rResolve"></p>
-        </div>
-      </div>
-
-      <div class="sec-h"><span class="bar"></span><h3>Plano de ataque</h3></div>
-      <div class="strategy" id="rStrategy"></div>
-
-      <p class="foot-note">Números redondos são metas de esforço, não promessa fechada.<br><b>Time Ramsons</b></p>
+      <p class="foot-note" style="margin-top:16px"><b>Time Ramsons</b></p>
     </div>
+
+    <div class="sec-h"><span class="bar"></span><h3>E se você abordasse mais?</h3><span class="hint">arraste o número</span></div>
+    <div class="card sim-card">
+      <div class="sim-funil">
+        <div class="sim-stage abord">
+          <div class="bar-track"><div class="bar-fill" id="simFillAbord" style="width:0%"></div></div>
+          <span class="sim-num" id="simNumAbord">0</span>
+          <span class="sim-lbl">abordados/dia</span>
+        </div>
+        <div class="sim-arrow">→</div>
+        <div class="sim-stage fecha">
+          <div class="bar-track"><div class="bar-fill" id="simFillFecha" style="width:0%"></div></div>
+          <span class="sim-num" id="simNumFecha">0</span>
+          <span class="sim-lbl">vendas/dia</span>
+        </div>
+      </div>
+      <input type="range" class="sim-range" id="simRange" min="0" max="0" value="0" step="1">
+      <div class="sim-range-lbl"><span id="simMinLbl">hoje</span><span id="simMaxLbl">+30</span></div>
+      <div class="sim-result" id="simResult"></div>
+    </div>
+
+    <div class="sec-h"><span class="bar"></span><h3>Meta Resolve (instalação)</h3></div>
+    <div class="resolve-box">
+      <div class="ic">AC</div>
+      <div>
+        <h4>Regra 4 pra 1</h4>
+        <p id="rResolve"></p>
+      </div>
+    </div>
+
+    <div class="sec-h"><span class="bar"></span><h3>Plano de ataque</h3></div>
+    <div class="strategy" id="rStrategy"></div>
+
+    <p class="foot-note">Números redondos são metas de esforço, não promessa fechada.<br><b>Time Ramsons</b></p>
 
     <div class="nav">
       <button class="btn btn-ghost" onclick="go(1)">Refazer</button>
@@ -619,8 +621,9 @@ async function compartilharResultado(){
   btn.disabled = true; btn.textContent = 'Gerando imagem...';
   const texto = `Minha meta na mão (${nomeMes}): preciso fechar ${state.Y} clientes/dia em ${state.diasVenda} dias de venda pra bater a meta. 💪 Time Ramsons`;
   try{
-    const canvas = await html2canvas(area, {backgroundColor:'#F4F6FA', scale:2});
-    const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    const canvas = await html2canvas(area, {backgroundColor:'#F4F6FA', scale:Math.max(3, window.devicePixelRatio||1), useCORS:true});
+    const blob = await new Promise(res=>canvas.toBlob(res,'image/png',1));
     const file = new File([blob], 'meta-na-mao-ramsons.png', {type:'image/png'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file], title:'Meta na Mão · Ramsons', text: texto});
