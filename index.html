@@ -80,6 +80,9 @@
   .inp-wrap.qty input{padding-left:14px}
   input:focus{border-color:var(--red);background:#fff}
   input::placeholder{color:#AEB6C6;font-weight:500}
+  input.suggested{border-color:var(--gold);background:var(--gold-soft);color:#8a6d00}
+  .sugestao-hint{display:none;margin-top:7px;font-size:11.5px;font-weight:600;color:#8a6d00;background:var(--gold-soft);border:1px solid #F3D97A;border-radius:8px;padding:6px 10px}
+  .qty-alert{display:none;margin-top:8px;font-size:12px;font-weight:600;color:var(--warn);background:#FFF3D6;border:1px solid #F3D97A;border-radius:10px;padding:8px 10px;line-height:1.4}
 
   /* CHIPS (folgas) */
   .chips{display:flex;flex-wrap:wrap;gap:10px}
@@ -247,13 +250,13 @@
       <div class="field">
         <label><span class="dot"></span>Clientes que você aborda por dia<span class="kind">quantidade</span></label>
         <div class="inp-wrap qty">
-          <input type="tel" id="abordados" inputmode="numeric" placeholder="Ex: 20" maxlength="3">
+          <input type="tel" id="abordados" inputmode="numeric" placeholder="Ex: 10" maxlength="3">
         </div>
       </div>
       <div class="field">
         <label><span class="dot"></span>Clientes que você fecha venda por dia<span class="kind">quantidade</span></label>
         <div class="inp-wrap qty">
-          <input type="tel" id="efetivados" inputmode="numeric" placeholder="Ex: 8" maxlength="3">
+          <input type="tel" id="efetivados" inputmode="numeric" placeholder="Ex: 5" maxlength="3">
         </div>
       </div>
     </div>
@@ -347,13 +350,16 @@
 /* ---------- Config das metas ---------- */
 const PRODUTOS = [
   {id:'produtos', nome:'Produtos',   sub:'Faturamento geral',      tipo:'money', cor:'#DD2638', ini:'PR'},
-  {id:'credito',  nome:'Crédito',    sub:'Carnê / financiamento',  tipo:'money', cor:'#1E2843', ini:'CR'},
   {id:'garantia', nome:'Garantia',   sub:'Garantia estendida',     tipo:'money', cor:'#E08A00', ini:'GA'},
   {id:'seguro',   nome:'Seguro',     sub:'Seguros Assurant',       tipo:'money', cor:'#1E9E6A', ini:'SG'},
-  {id:'resolve',  nome:'Resolve',    sub:'Instalação de ar (qtd)', tipo:'qty',   cor:'#7A3FF2', ini:'RS'},
+  {id:'credito',  nome:'Crédito',    sub:'Carnê / financiamento',  tipo:'money', cor:'#1E2843', ini:'CR'},
   {id:'psd',      nome:'PSD',        sub:'Pit Stop Digital',       tipo:'money', cor:'#0E8FD6', ini:'PS'},
   {id:'instaltv', nome:'Instal TV',  sub:'Instalação de TV',       tipo:'money', cor:'#C43B7A', ini:'TV'},
+  {id:'resolve',  nome:'Resolve',    sub:'Instalação de ar (qtd)', tipo:'qty',   cor:'#7A3FF2', ini:'RS'},
 ];
+
+/* % de sugestão automática sobre a meta de Produtos */
+const SUGESTOES = {garantia:0.06, seguro:0.03};
 
 const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const hoje = new Date();
@@ -389,17 +395,64 @@ PRODUTOS.forEach(p=>{
   const f = document.createElement('div');
   f.className='field';
   const isMoney = p.tipo==='money';
+  const isSugerido = SUGESTOES.hasOwnProperty(p.id);
+  const isQtyAlerta = p.id==='resolve';
   f.innerHTML = `
     <label><span class="dot" style="background:${p.cor}"></span>${p.nome}
       <span class="kind">${isMoney?'valor R$':'quantidade'}</span></label>
     <div class="inp-wrap ${isMoney?'':'qty'}">
       ${isMoney?'<span class="pre">R$</span>':''}
       <input type="tel" inputmode="numeric" id="m_${p.id}" placeholder="${isMoney?'0,00':'0'}" autocomplete="off">
-    </div>`;
+    </div>
+    ${isSugerido?`<div class="sugestao-hint" id="hint_${p.id}">Sugestão automática: ${SUGESTOES[p.id]*100}% da meta de Produtos — pode editar.</div>`:''}
+    ${isQtyAlerta?`<div class="qty-alert" id="alert_${p.id}"></div>`:''}`;
   wrap.appendChild(f);
   const inp = f.querySelector('input');
-  inp.addEventListener('input', ()=> isMoney ? maskBRL(inp) : maskInt(inp));
+  inp.addEventListener('input', ()=>{
+    isMoney ? maskBRL(inp) : maskInt(inp);
+    if(isSugerido){
+      inp.classList.remove('suggested');
+      delete inp.dataset.suggested;
+      inp.dataset.touched = '1';
+      document.getElementById('hint_'+p.id).style.display='none';
+    }
+    if(p.id==='produtos') aplicarSugestoes(inp.dataset.val||0);
+    if(isQtyAlerta) checarAlertaResolve(inp);
+  });
 });
+
+/* ---------- Sugestão automática Garantia/Seguro ---------- */
+function aplicarSugestoes(valorProdutos){
+  const v = parseFloat(valorProdutos)||0;
+  Object.keys(SUGESTOES).forEach(id=>sugerirCampo(id, v*SUGESTOES[id]));
+}
+function sugerirCampo(id, valor){
+  const el = document.getElementById('m_'+id);
+  const hint = document.getElementById('hint_'+id);
+  if(!el) return;
+  if(el.dataset.touched==='1') return; // usuário já editou manualmente, não sobrescreve
+  if(valor<=0){
+    if(el.dataset.suggested==='1'){ el.value=''; el.dataset.val=0; el.classList.remove('suggested'); delete el.dataset.suggested; if(hint) hint.style.display='none'; }
+    return;
+  }
+  el.dataset.val = valor;
+  el.value = valor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  el.dataset.suggested = '1';
+  el.classList.add('suggested');
+  if(hint) hint.style.display='block';
+}
+
+/* ---------- Alerta: Resolve é quantidade, não valor ---------- */
+function checarAlertaResolve(inp){
+  const alertEl = document.getElementById('alert_resolve');
+  const v = parseInt(inp.dataset.val||0,10);
+  if(v>15){
+    alertEl.innerHTML = `⚠️ Essa meta é <b>quantidade</b> de instalações, não valor em R$. Confirma que são <b>${v} instalações</b> no mês?`;
+    alertEl.style.display='block';
+  } else {
+    alertEl.style.display='none';
+  }
+}
 
 /* ---------- Chips de folga ---------- */
 const chips = document.querySelectorAll('#folgaChips .chip');
@@ -593,7 +646,7 @@ function buildStrategy(diaria, diasVenda, X, Y, conv, resolveDia, arCond){
   s.push(`Sua meta de faturamento por cliente que fecha é de <strong>${fmtBRL0(prodCli)}</strong>. Antes de fechar, sempre puxe um item a mais para chegar nesse ticket.`);
 
   // Crédito / anexos
-  const anexos = ['credito','garantia','seguro','psd'].filter(id=>(diaria[id]||0)>0);
+  const anexos = ['garantia','seguro','credito','psd'].filter(id=>(diaria[id]||0)>0);
   if(anexos.length){
     const nomes = anexos.map(id=>PRODUTOS.find(p=>p.id===id).nome).join(', ');
     s.push(`Trabalhe <b>${nomes}</b> como venda cruzada dentro do atendimento. Cada produto tem meta por cliente na tabela acima, use como checklist antes de finalizar.`);
