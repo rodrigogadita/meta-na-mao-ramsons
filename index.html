@@ -104,6 +104,8 @@
   .btn-ghost{background:#fff;border:2px solid var(--line);color:var(--ink);flex:0 0 auto;padding:15px 18px}
   .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
   .err{color:var(--red);font-size:12.5px;font-weight:600;margin-top:10px;min-height:16px}
+  .clear-link{text-align:center;font-size:12px;color:var(--muted);font-weight:600;margin-top:16px;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line)}
+  .clear-link:hover{color:var(--red)}
 
   /* RESULTS */
   .summary{background:linear-gradient(135deg,var(--red),var(--red-deep));color:#fff;border-radius:var(--radius);padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
@@ -210,6 +212,7 @@
     <div class="nav">
       <button class="btn btn-primary" onclick="go(2)">Continuar</button>
     </div>
+    <p class="clear-link" onclick="limparTudo()">🗑 Limpar dados salvos neste navegador</p>
   </section>
 
   <!-- STEP 2 -->
@@ -733,6 +736,36 @@ function load(){
 }
 document.getElementById('abordados').addEventListener('input',e=>maskInt(e.target));
 document.getElementById('efetivados').addEventListener('input',e=>maskInt(e.target));
+
+/* ---------- Limpar tudo (evita cache/números viciados) ---------- */
+function limparTudo(){
+  if(!confirm('Isso vai apagar todos os números digitados e o cache salvo neste navegador. Confirma?')) return;
+  try{ localStorage.removeItem('ramsons_metas'); }catch(e){}
+
+  state.metas={}; state.folgas=null; state.abordados=0; state.efetivados=0;
+  state.diasVenda=0; state.X=0; state.Y=0; state.conv=0;
+
+  PRODUTOS.forEach(p=>{
+    const el=document.getElementById('m_'+p.id);
+    el.value=''; el.dataset.val=0;
+    el.classList.remove('suggested'); delete el.dataset.suggested; delete el.dataset.touched;
+    const hint=document.getElementById('hint_'+p.id); if(hint) hint.style.display='none';
+  });
+  const alertResolve=document.getElementById('alert_resolve'); if(alertResolve) alertResolve.style.display='none';
+
+  chips.forEach(c=>c.classList.remove('sel'));
+  otherWrap.classList.remove('on'); otherInp.value='';
+
+  const ab=document.getElementById('abordados'); ab.value=''; ab.dataset.val=0;
+  const ef=document.getElementById('efetivados'); ef.value=''; ef.dataset.val=0;
+
+  document.getElementById('err1').textContent='';
+  document.getElementById('err2').textContent='';
+  document.getElementById('err3').textContent='';
+
+  show(1);
+}
+
 load();
 paintProgress();
 </script>
