@@ -73,12 +73,9 @@
   .menu-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.4}
 
   /* DEEP LINK */
-  .deep-link{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);
-    background:var(--cloud);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:16px}
-  .deep-link span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .copy-btn{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 10px;
-    font-size:11px;font-weight:700;cursor:pointer;color:var(--red);font-family:inherit}
-  .copy-btn:hover{border-color:var(--red)}
+  .deep-link{display:inline-block;font-size:11.5px;color:var(--muted);font-weight:600;
+    background:var(--cloud);border:1px solid var(--line);border-radius:99px;padding:7px 14px;margin-bottom:16px;cursor:pointer}
+  .deep-link:hover{border-color:var(--red);color:var(--red)}
 
   /* TABELA EFICIÊNCIA */
   .eff-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;overflow-x:auto}
@@ -90,6 +87,23 @@
   .eff-table tr.eff-atual td{background:var(--gold-soft);color:#8a6d00;font-weight:800}
   .eff-table tr.eff-atual td:first-child{border-radius:8px 0 0 8px}
   .eff-table tr.eff-atual td:last-child{border-radius:0 8px 8px 0}
+
+  /* CHIPS DE TEXTO (responsivos, 2 colunas) */
+  .chips-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chip.chip-txt{flex:none;font-size:13px;padding:12px 8px;line-height:1.25;word-break:break-word}
+  .chip.chip-txt small{font-size:10.5px}
+
+  /* CHIPS DE PARCELAS (1x a 12x) */
+  .chips-parcelas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .chip-parcela{padding:11px 4px;font-size:15px}
+  .chip-parcela small{font-size:10px}
+
+  /* BOTÃO DE ALTERNÂNCIA (método de pagamento) */
+  .toggle-btn{width:100%;text-align:center;background:var(--cloud);border:2px solid var(--line);border-radius:12px;
+    padding:14px;font-family:'Poppins';font-weight:700;font-size:15px;color:var(--ink);cursor:pointer;transition:.15s}
+  .toggle-btn:hover{border-color:var(--red)}
+  .toggle-btn:active{transform:translateY(1px)}
+
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .step-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:4px}
   .step h2{font-size:21px;font-weight:700;margin-bottom:4px}
@@ -255,7 +269,7 @@
   </div>
 
   <div class="screen" id="screenMetas">
-  <div class="deep-link" id="dlMetas">🔗 <span id="dlMetasUrl"></span><button class="copy-btn" onclick="copiarLink('dlMetasUrl', this)">Copiar</button></div>
+  <div class="deep-link" onclick="copiarLink('metas', this)">🔗 Copiar link direto desta calculadora</div>
 
   <!-- STEP 1 -->
   <section class="step on" data-step="1">
@@ -397,26 +411,24 @@
     <p class="foot-note">Números redondos são metas de esforço, não promessa fechada.<br><b>Time Ramsons</b></p>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="go(1)">Refazer</button>
+      <button class="btn btn-ghost" onclick="go(3)">← Voltar</button>
       <button class="btn btn-whats" id="btnShare" onclick="compartilharResultado()">📲 Compartilhar no WhatsApp</button>
     </div>
     <div class="nav">
       <button class="btn btn-ghost" style="flex:1" onclick="window.print()">Salvar / imprimir</button>
     </div>
+    <p class="clear-link" onclick="go(1)">Recomeçar do zero (Passo 1)</p>
   </section>
 
   </div>
 
   <!-- CALCULAR PARCELA -->
   <div class="screen" id="screenParcela">
-    <div class="deep-link" id="dlParcela">🔗 <span id="dlParcelaUrl"></span><button class="copy-btn" onclick="copiarLink('dlParcelaUrl', this)">Copiar</button></div>
+    <div class="deep-link" onclick="copiarLink('parcela', this)">🔗 Copiar link direto desta calculadora</div>
     <div class="card grid">
       <div class="field">
         <label>Método de pagamento</label>
-        <div class="chips" id="metodoChips">
-          <div class="chip sel" data-m="ramsons">Crédito<small>Ramsons</small></div>
-          <div class="chip" data-m="cartao">Cartão<small>de crédito</small></div>
-        </div>
+        <button type="button" class="toggle-btn" id="metodoToggle" data-m="ramsons" onclick="alternarMetodo()">⇄ Crédito Ramsons</button>
       </div>
 
       <div class="field">
@@ -426,11 +438,11 @@
 
       <div class="field">
         <label>Tipo de serviço agregado</label>
-        <div class="chips" id="pcTipoChips">
-          <div class="chip sel" data-t="garantia">Garantia<small>estendida</small></div>
-          <div class="chip" data-t="seguro">Seguro<small>Assurant</small></div>
-          <div class="chip" data-t="instalacao">Instal.<small>ar/TV</small></div>
-          <div class="chip" data-t="psd">PSD<small>digital</small></div>
+        <div class="chips chips-grid2" id="pcTipoChips">
+          <div class="chip chip-txt sel" data-t="garantia">Garantia<small>estendida</small></div>
+          <div class="chip chip-txt" data-t="seguro">Seguro<small>Assurant</small></div>
+          <div class="chip chip-txt" data-t="resolve">Resolve<small>instalação de ar</small></div>
+          <div class="chip chip-txt" data-t="psd">PSD<small>digital</small></div>
         </div>
       </div>
 
@@ -449,8 +461,8 @@
       </div>
 
       <div class="field">
-        <label>Quantidade de parcelas</label>
-        <div class="inp-wrap qty"><input type="tel" inputmode="numeric" id="pcParcelas" placeholder="Ex: 10" maxlength="2"></div>
+        <label>Quantidade de parcelas<span class="kind">até 12x sem juros</span></label>
+        <div class="chips chips-parcelas" id="pcParcelasChips"></div>
       </div>
     </div>
     <div class="err" id="errParcela"></div>
@@ -482,7 +494,7 @@
 
   <!-- CALCULAR EFICIÊNCIA -->
   <div class="screen" id="screenEficiencia">
-    <div class="deep-link" id="dlEficiencia">🔗 <span id="dlEficienciaUrl"></span><button class="copy-btn" onclick="copiarLink('dlEficienciaUrl', this)">Copiar</button></div>
+    <div class="deep-link" onclick="copiarLink('eficiencia', this)">🔗 Copiar link direto desta calculadora</div>
     <div class="card grid">
       <div class="field">
         <label><span class="dot" style="background:#DD2638"></span>Valor do produto<span class="kind">valor R$</span></label>
@@ -970,20 +982,13 @@ function showScreen(name){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ---------- Links diretos por calculadora ---------- */
-function popularLinks(){
-  const base = location.origin + location.pathname;
-  Object.keys(SLUGS).forEach(slug=>{
-    const el = document.getElementById('dl'+SLUGS[slug]+'Url');
-    if(el) el.textContent = base+'#'+slug;
-  });
-}
-function copiarLink(id, btn){
-  const text = document.getElementById(id).textContent;
-  const original = btn.textContent;
-  const marcarCopiado = ()=>{ btn.textContent='Copiado!'; setTimeout(()=>btn.textContent=original, 1500); };
+/* ---------- Link direto por calculadora ---------- */
+function copiarLink(slug, el){
+  const url = location.origin + location.pathname + '#' + slug;
+  const original = el.textContent;
+  const marcarCopiado = ()=>{ el.textContent='✅ Link copiado!'; setTimeout(()=>el.textContent=original, 1500); };
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(marcarCopiado).catch(()=>{});
+    navigator.clipboard.writeText(url).then(marcarCopiado).catch(()=>{});
   }
 }
 
@@ -1000,19 +1005,36 @@ function toggleDuracaoWrap(){
   const tipo = document.querySelector('#pcTipoChips .chip.sel').dataset.t;
   document.getElementById('pcDuracaoWrap').style.display = tipo==='garantia' ? 'block' : 'none';
 }
-wireChips('metodoChips', calcularParcela);
+function alternarMetodo(){
+  const btn = document.getElementById('metodoToggle');
+  const novo = btn.dataset.m==='ramsons' ? 'cartao' : 'ramsons';
+  btn.dataset.m = novo;
+  btn.textContent = novo==='ramsons' ? '⇄ Crédito Ramsons' : '⇄ Cartão de Crédito';
+  calcularParcela();
+}
+
+const pcParcelasWrap = document.getElementById('pcParcelasChips');
+for(let n=1;n<=12;n++){
+  const c=document.createElement('div');
+  c.className='chip chip-parcela';
+  c.dataset.p=n;
+  c.innerHTML = `${n}<small>x</small>`;
+  pcParcelasWrap.appendChild(c);
+}
+
 wireChips('pcTipoChips', ()=>{ toggleDuracaoWrap(); calcularParcela(); });
 wireChips('pcDuracaoChips', calcularParcela);
+wireChips('pcParcelasChips', calcularParcela);
 toggleDuracaoWrap();
 
 document.getElementById('pcProduto').addEventListener('input', e=>{ maskBRL(e.target); calcularParcela(); });
 document.getElementById('pcServico').addEventListener('input', e=>{ maskBRL(e.target); calcularParcela(); });
-document.getElementById('pcParcelas').addEventListener('input', e=>{ maskInt(e.target); calcularParcela(); });
 
 function calcularParcela(){
   const produto = parseFloat(document.getElementById('pcProduto').dataset.val||0);
   const servico = parseFloat(document.getElementById('pcServico').dataset.val||0);
-  const parcelas = parseInt(document.getElementById('pcParcelas').dataset.val||0,10);
+  const parcelasSel = document.querySelector('#pcParcelasChips .chip.sel');
+  const parcelas = parcelasSel ? parseInt(parcelasSel.dataset.p,10) : 0;
   const err = document.getElementById('errParcela');
   const resWrap = document.getElementById('pcResultado');
 
@@ -1029,17 +1051,17 @@ function calcularParcela(){
   document.getElementById('pcValServico').innerHTML = fmtBRL(parcServico)+` <small>${parcelas}x</small>`;
 
   const tipo = document.querySelector('#pcTipoChips .chip.sel').dataset.t;
-  const metodo = document.querySelector('#metodoChips .chip.sel').dataset.m==='ramsons' ? 'Crédito Ramsons' : 'Cartão de crédito';
+  const metodo = document.getElementById('metodoToggle').dataset.m==='ramsons' ? 'Crédito Ramsons' : 'Cartão de Crédito';
   let frase='';
   if(tipo==='garantia'){
     const dur = document.querySelector('#pcDuracaoChips .chip.sel').dataset.d;
-    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, seu produto fica com <b>Garantia Extra por mais ${dur} meses</b>."`;
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês, parcelado no seu ${metodo}, seu produto fica com <b>Garantia Extra por mais ${dur} meses</b>."`;
   } else if(tipo==='seguro'){
-    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, seu produto fica <b>protegido com o Seguro Assurant</b>."`;
-  } else if(tipo==='instalacao'){
-    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, a <b>instalação já sai garantida</b>, sem dor de cabeça."`;
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês, parcelado no seu ${metodo}, seu produto fica <b>protegido com o Seguro Assurant</b>."`;
+  } else if(tipo==='resolve'){
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês, parcelado no seu ${metodo}, seu produto sai com a <b>Resolve</b> — instalação de ar profissional, sem dor de cabeça."`;
   } else {
-    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês no seu ${metodo}, seu produto sai com <b>Pit Stop Digital</b>."`;
+    frase = `"Por mais <b>${fmtBRL(parcServico)}</b> por mês, parcelado no seu ${metodo}, seu produto sai com <b>Pit Stop Digital</b>."`;
   }
   document.getElementById('pcFrase').innerHTML = frase;
   resWrap.style.display='block';
@@ -1048,10 +1070,10 @@ function calcularParcela(){
 function limparParcela(){
   const pr=document.getElementById('pcProduto'); pr.value=''; pr.dataset.val=0;
   const sv=document.getElementById('pcServico'); sv.value=''; sv.dataset.val=0;
-  const pa=document.getElementById('pcParcelas'); pa.value=''; pa.dataset.val=0;
-  document.querySelectorAll('#metodoChips .chip').forEach((c,i)=>c.classList.toggle('sel', i===0));
+  const mt=document.getElementById('metodoToggle'); mt.dataset.m='ramsons'; mt.textContent='⇄ Crédito Ramsons';
   document.querySelectorAll('#pcTipoChips .chip').forEach((c,i)=>c.classList.toggle('sel', i===0));
   document.querySelectorAll('#pcDuracaoChips .chip').forEach((c,i)=>c.classList.toggle('sel', i===0));
+  document.querySelectorAll('#pcParcelasChips .chip').forEach(c=>c.classList.remove('sel'));
   toggleDuracaoWrap();
   document.getElementById('pcResultado').style.display='none';
   document.getElementById('errParcela').textContent='';
@@ -1133,7 +1155,6 @@ function limparEficiencia(){
 }
 
 /* ---------- Roteamento inicial por link direto (#metas, #parcela, #eficiencia) ---------- */
-popularLinks();
 const hashSlug = location.hash.replace('#','').toLowerCase();
 if(SLUGS[hashSlug]) showScreen(SLUGS[hashSlug]);
 
