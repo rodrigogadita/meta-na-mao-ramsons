@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de BTU · Ramsons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.1.0/tabler-icons.min.css">
+<style>
+  :root{
+    --bg:#F4F0EC;--surface:#FFFFFF;--ink:#1B1613;--muted:#6E635C;
+    --brand:#CE0E3D;--brand-soft:#FBE7EC;--cool:#0E8FA8;--cool-soft:#E1F4F7;--cool-ink:#0A5F70;
+    --line:#E7DFD8;--line-strong:#D6CBC1;--warn:#B4690E;--warn-soft:#FBEEDD;--ok:#2E6B2A;--ok-soft:#EAF3E9;--r:11px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:14px 18px 30px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 0 14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand-mark{width:38px;height:38px;border-radius:9px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"Archivo";font-weight:800;font-size:19px}
+  .brand h1{font-family:"Archivo";font-weight:700;font-size:18px;letter-spacing:-.01em}
+  .brand p{font-size:12px;color:var(--muted)}
+  .loc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:6px 12px;border-radius:999px}
+
+  .grid{display:grid;grid-template-columns:1fr 384px;gap:16px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+
+  .step{display:flex;align-items:center;gap:8px;margin:0 0 12px}
+  .step:not(:first-of-type){margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+  .step .n{width:20px;height:20px;border-radius:50%;background:var(--brand);color:#fff;font-family:"Archivo";font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .step h3{font-family:"Archivo";font-weight:700;font-size:13.5px}
+  .step small{color:var(--muted);font-weight:400;font-size:12px}
+
+  .fld{margin-bottom:12px}.fld:last-child{margin-bottom:0}
+  .fld > label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:7px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .seg{display:flex;flex-wrap:wrap;gap:6px}
+  .seg button{flex:1 1 auto;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);padding:8px 11px;border-radius:8px;font-size:12.5px;font-weight:500;cursor:pointer;transition:.12s;white-space:nowrap}
+  .seg button:hover{border-color:var(--brand);color:var(--brand)}
+  .seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .seg.cool button.on{background:var(--cool);border-color:var(--cool)}
+
+  .rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:6px}
+  .rooms button{display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid var(--line-strong);background:var(--surface);border-radius:9px;padding:10px 6px;cursor:pointer;transition:.12s;color:var(--ink)}
+  .rooms button i{font-size:20px;color:var(--muted)}
+  .rooms button span{font-size:11px;font-weight:500;text-align:center;line-height:1.2}
+  .rooms button:hover{border-color:var(--brand)}
+  .rooms button.on{border-color:var(--brand);background:var(--brand-soft)}
+  .rooms button.on i,.rooms button.on span{color:var(--brand)}
+
+  .num{display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+  .num input{flex:1;border:0;padding:9px 11px;font-size:15px;font-weight:600;color:var(--ink);width:100%;background:transparent;outline:none;-moz-appearance:textfield}
+  .num input::-webkit-outer-spin-button,.num input::-webkit-inner-spin-button{-webkit-appearance:none}
+  .num .unit{padding:0 12px;font-size:12.5px;color:var(--muted);border-left:1px solid var(--line)}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .chips button{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:.12s}
+  .chips button:hover{border-color:var(--brand);color:var(--brand)}
+  .chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .stepper{display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;width:fit-content}
+  .stepper button{width:38px;height:38px;border:0;background:var(--surface);color:var(--ink);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .stepper button:hover{background:var(--bg);color:var(--brand)}
+  .stepper .val{min-width:40px;text-align:center;font-weight:600;font-size:15px}
+
+  /* dica contextual (só aparece quando disparada) */
+  .chint{display:flex;gap:6px;align-items:flex-start;font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:7px}
+  .chint i{font-size:14px;margin-top:1px;flex-shrink:0}
+  .chint.warn{color:#7A4708}.chint.warn i{color:var(--warn)}
+  .chint[hidden]{display:none}
+
+  /* resultado */
+  .result{position:sticky;top:14px}
+  .result .card{padding:0;overflow:hidden}
+  .hero{background:var(--cool-soft);padding:16px 18px;display:flex;align-items:flex-end;justify-content:space-between}
+  .hero .lbl{font-size:11.5px;font-weight:600;color:var(--cool-ink);text-transform:uppercase;letter-spacing:.05em}
+  .hero .big{font-family:"Archivo";font-weight:800;font-size:44px;line-height:.95;color:var(--cool-ink);letter-spacing:-.02em;margin-top:4px}
+  .hero .big small{font-size:16px;font-weight:600}
+  .hero i{font-size:26px;color:var(--cool);opacity:.7}
+  .rb{padding:16px 18px}
+  .brk{list-style:none;font-size:12px;margin-bottom:14px}
+  .brk li{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
+  .brk li b{color:var(--ink);font-weight:600}
+  .brk li.tot{border-top:1px solid var(--line);margin-top:3px;padding-top:7px;color:var(--ink);font-weight:600}
+
+  .prod{border:2px solid var(--brand);border-radius:10px;padding:14px}
+  .prod .k{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brand);margin-bottom:9px}
+  .prod .row{display:flex;align-items:center;gap:11px}
+  .prod .ic{width:44px;height:44px;border-radius:9px;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0}
+  .prod .nm{font-family:"Archivo";font-weight:700;font-size:16px;line-height:1.1}
+  .prod .cap{font-size:13px;color:var(--cool-ink);font-weight:600;margin-top:2px}
+  .prod .foco{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .prod .pn{font-size:12.5px;color:var(--ink);margin-top:11px;line-height:1.4}
+  .prod .pn b{font-weight:600}
+  .verbtn{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;background:var(--brand);color:#fff;text-decoration:none;padding:11px;border-radius:9px;font-family:"Archivo";font-weight:700;font-size:13.5px;transition:.12s}
+  .verbtn:hover{background:#B10B33}
+  .brands{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .brands a{color:var(--cool-ink);text-decoration:none;border-bottom:1px solid var(--cool-soft)}
+  .brands a:hover{border-color:var(--cool)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+  .tag.folga{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+  .tag.v{background:var(--cool-soft);border-color:transparent;color:var(--cool-ink)}
+
+  .alt{display:flex;gap:7px;align-items:baseline;font-size:12px;color:var(--muted);margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
+  .alt .l{font-weight:600;color:var(--ink);white-space:nowrap}
+  .alt a{color:var(--cool-ink);text-decoration:none;border-bottom:1px solid var(--cool-soft)}
+  .alt[hidden]{display:none}
+
+  #tips{margin-top:2px}
+  .tip{display:flex;gap:7px;align-items:flex-start;font-size:11.5px;line-height:1.4;color:var(--muted);margin-top:9px}
+  .tip i{font-size:14px;margin-top:1px;flex-shrink:0;color:var(--cool)}
+  .tip.warn{color:#7A4708}.tip.warn i{color:var(--warn)}
+
+  .foot{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.5;text-align:center}
+
+  /* Navegação padrão do projeto Ramsons */
+  .rmn-bar{background:linear-gradient(135deg,#DD2638,#B3162A);color:#fff;padding:10px 18px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:"Inter",system-ui,sans-serif}
+  .rmn-brand{font-weight:800;font-size:15px;letter-spacing:.5px}
+  .rmn-home{color:#fff;text-decoration:none;font-size:12px;font-weight:700;background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:6px 14px;white-space:nowrap}
+  .rmn-home:hover{background:rgba(255,255,255,.25)}
+</style>
+</head>
+<body>
+<div class="rmn-bar">
+  <div class="rmn-brand">RAMSONS</div>
+  <a class="rmn-home" href="../">← Início</a>
+</div>
+<div class="wrap">
+
+  <header>
+    <div class="brand"><div class="brand-mark">R</div><div><h1>Calculadora de BTU</h1><p>Dimensionamento de ar-condicionado · padrão Ramsons</p></div></div>
+    <div class="loc"><i class="ti ti-map-pin"></i> Calibrada para Manaus / AM</div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+
+      <div class="step"><span class="n">1</span><h3>Onde vai instalar? <small>casa ou empresa</small></h3></div>
+      <div class="fld"><div class="seg" id="imovel"><button data-v="residencial" class="on">Residencial</button><button data-v="comercial">Comercial</button></div></div>
+      <div class="fld"><label>Ambiente</label><div class="rooms" id="rooms"></div>
+        <div class="chint" id="hRoom" hidden></div>
+      </div>
+
+      <div class="step"><span class="n">2</span><h3>Qual o tamanho?</h3></div>
+      <div class="fld"><div class="num"><input type="number" id="area" min="1" max="500" value="12"><span class="unit">m²</span></div><div class="chips" id="chips"></div></div>
+
+      <div class="step"><span class="n">3</span><h3>Quanto calor pega?</h3></div>
+      <div class="fld"><label>Incidência de sol</label>
+        <div class="seg" id="sol"><button data-v="600">Sombra / manhã</button><button data-v="700" class="on">Sol da tarde</button><button data-v="800">Sol o dia todo</button></div></div>
+      <div class="fld"><label>Cobertura / teto</label>
+        <div class="seg" id="cobertura"><button data-v="0" class="on">Laje / gesso</button><button data-v="0.05">Telha c/ forro</button><button data-v="0.08">Laje exposta</button><button data-v="0.12">Telha s/ forro</button><button data-v="0.18">Metálica s/ forro</button></div>
+        <div class="chint warn" id="hCob" hidden></div></div>
+      <div class="fld"><label>Pé-direito</label>
+        <div class="seg" id="pedireito"><button data-v="0" class="on">Padrão</button><button data-v="0.10">Alto (+3 m)</button></div></div>
+
+      <div class="step"><span class="n">4</span><h3>Quem e o que fica dentro?</h3></div>
+      <div class="two">
+        <div class="fld"><label>Pessoas</label><div class="stepper" data-step="pessoas"><button data-d="-1">−</button><div class="val" id="pessoas">2</div><button data-d="1">+</button></div></div>
+        <div class="fld"><label>Equipamentos que esquentam</label><div class="stepper" data-step="equip"><button data-d="-1">−</button><div class="val" id="equip">0</div><button data-d="1">+</button></div></div>
+      </div>
+
+      <div class="step"><span class="n">5</span><h3>Preferências do cliente</h3></div>
+      <div class="two">
+        <div class="fld"><label>Voltagem</label><div class="seg" id="voltagem"><button data-v="220" class="on">220V</button><button data-v="127">127V</button></div></div>
+        <div class="fld"><label>Tecnologia</label><div class="seg cool" id="tipo"><button data-v="inverter" class="on">Inverter</button><button data-v="onoff">On/off</button></div></div>
+      </div>
+      <div class="chint" id="hTec" hidden></div>
+    </div>
+
+    <div class="result">
+      <div class="card">
+        <div class="hero"><div><div class="lbl">BTUs necessários</div><div class="big"><span id="btuOut">0</span> <small>BTUs</small></div></div><i class="ti ti-snowflake"></i></div>
+        <div class="rb">
+          <ul class="brk" id="brk"></ul>
+          <div class="prod" id="prod"></div>
+          <div class="alt" id="alt" hidden></div>
+          <div id="tips"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Estimativa de referência. Cozinhas industriais, pé-direito duplo ou grandes vãos de vidro pedem visita técnica.</p>
+</div>
+
+<script>
+/* CATÁLOGO REAL RAMSONS — atualize conforme o estoque */
+const PRODUTOS=[
+  {fam:'split',cap:9000,v:220,marca:'LG',nome:'LG 9.000 Dual Inverter Voice',url:'https://www.ramsons.com.br/ar-condicionado-split-00085653-p36056'},
+  {fam:'split',cap:9000,v:220,marca:'Samsung',nome:'Samsung 9.000 WindFree AI',url:'https://www.ramsons.com.br/ar-split-00085238-p35922'},
+  {fam:'split',cap:9000,v:220,marca:'Midea',nome:'Midea 9.000 AI Ecomaster Inverter',url:'https://www.ramsons.com.br/split-00085164-p35888'},
+  {fam:'split',cap:9000,v:220,marca:'Gree',nome:'Gree 9.000 G-Side Inverter',url:'https://www.ramsons.com.br/ar-condicionado-00084805-p31479'},
+  {fam:'split',cap:9000,v:220,marca:'TCL',nome:'TCL 9.000 Hi Wall Inverter HD',url:'https://www.ramsons.com.br/ar-split-tcl-00084792-p35764'},
+  {fam:'split',cap:12000,v:220,marca:'Samsung',nome:'Samsung 12.000 WindFree AI',url:'https://www.ramsons.com.br/ar-condicionado-split-00085160-p35884'},
+  {fam:'split',cap:12000,v:220,marca:'Midea',nome:'Midea 12.000 AI Airvolution',url:'https://www.ramsons.com.br/ar-condicionado-split-00086036-p36971'},
+  {fam:'split',cap:12000,v:220,marca:'Electrolux',nome:'Electrolux 12.000 Color Adapt Inverter',url:'https://www.ramsons.com.br/ar-condicionado-electrolux-ji12f-je12f-color-adapt-inverter-12-000-btus-frio-220v-00083265-p26623-p35538'},
+  {fam:'split',cap:12000,v:220,marca:'Elgin',nome:'Elgin 12.000 High Wall Eco Inverter',url:'https://www.ramsons.com.br/ar-condicionado-00086367-p38434'},
+  {fam:'split',cap:18000,v:220,marca:'LG',nome:'LG 18.000 Dual Inverter Compact',url:'https://www.ramsons.com.br/ar-split-00083605-p35580'},
+  {fam:'split',cap:18000,v:220,marca:'Samsung',nome:'Samsung 18.000 WindFree AI',url:'https://www.ramsons.com.br/ar-split-00085240-p35924'},
+  {fam:'split',cap:18000,v:220,marca:'Gree',nome:'Gree 18.000 G-Side Inverter',url:'https://www.ramsons.com.br/ar-condicionado-split-00084811-p31761'},
+  {fam:'split',cap:18000,v:220,marca:'Midea',nome:'Midea 18.000 AI Ecomaster Inverter',url:'https://www.ramsons.com.br/split-00085173-p35890'},
+  {fam:'split',cap:18000,v:220,marca:'TCL',nome:'TCL 18.000 Inverter Comando de Voz',url:'https://www.ramsons.com.br/ar-split-00085969-p36178'},
+  {fam:'split',cap:22000,v:220,marca:'LG',nome:'LG 22.000 Dual Hi-Wall Inverter',url:'https://www.ramsons.com.br/ar-condicionado-00085658-p36058'},
+  {fam:'split',cap:22000,v:220,marca:'Springer Midea',nome:'Springer Midea 22.000 AirVolution',url:'https://www.ramsons.com.br/split-00083163-p35514'},
+  {fam:'split',cap:22000,v:220,marca:'Midea',nome:'Midea 22.000 Hi Wall Airvolution',url:'https://www.ramsons.com.br/ar-condicionado-split-00086067-p36967'},
+  {fam:'split',cap:24000,v:220,marca:'Samsung',nome:'Samsung 24.000 WindFree AI',url:'https://www.ramsons.com.br/ar-split-00085310-p35960'},
+  {fam:'split',cap:24000,v:220,marca:'Midea',nome:'Midea 24.000 AI Ecomaster Inverter',url:'https://www.ramsons.com.br/split-00085177-p35892'},
+  {fam:'split',cap:24000,v:220,marca:'Electrolux',nome:'Electrolux 24.000 Color Adapt Inverter',url:'https://www.ramsons.com.br/ar-condicionado-00083794-p35640'},
+  {fam:'split',cap:32000,v:220,marca:'TCL',nome:'TCL 32.000 Hi Wall Inverter',url:'https://www.ramsons.com.br/ar-condicionadp-00085645-p36050'},
+  {fam:'janela',cap:7500,v:127,marca:'Midea',nome:'Midea 7.500 Inverter Eletrônico',url:'https://www.ramsons.com.br/ar-condicionado-00086464-p38797'},
+  {fam:'janela',cap:7500,v:127,marca:'Midea',nome:'Midea 7.500 Mecânico',url:'https://www.ramsons.com.br/00086598-ar-janela-p39139'},
+  {fam:'janela',cap:10000,v:127,marca:'Midea',nome:'Midea 10.000 Mecânico',url:'https://www.ramsons.com.br/ar-condicionado-janela-00086181-p37504'},
+  {fam:'janela',cap:10000,v:127,marca:'Mystic',nome:'Mystic 10.000 Eletrônico',url:'https://www.ramsons.com.br/ar-janela-00085733-p36495'},
+  {fam:'janela',cap:10000,v:220,marca:'Springer Midea',nome:'Springer Midea 10.000 Mecânico',url:'https://www.ramsons.com.br/ar-00086060-p37145'},
+  {fam:'janela',cap:12000,v:127,marca:'Springer Midea',nome:'Springer Midea 12.000 Mecânico',url:'https://www.ramsons.com.br/ar-janela-00086068-p37073'},
+  {fam:'janela',cap:20000,v:220,marca:'Springer Midea',nome:'Springer Midea 20.000 Mecânico',url:'https://www.ramsons.com.br/ar-condicionado-janela-springer-midea-zck215bb-mecanico-20-000-btus-frio-220v-00083851-p35650'},
+  {fam:'pisoteto',cap:36000,v:220,marca:'Electrolux',nome:'Electrolux 36.000 Piso-Teto Inverter',url:'https://www.ramsons.com.br/ar-condicionado-split-00086192-p37473'},
+  {fam:'pisoteto',cap:36000,v:220,marca:'LG',nome:'LG 36.000 Teto Inverter',url:'https://www.ramsons.com.br/00086510-ar-condicionado-p38871'},
+  {fam:'pisoteto',cap:36000,v:220,marca:'TCL',nome:'TCL 36.000 Piso-Teto Inverter',url:'https://www.ramsons.com.br/ar-cassete-00085757-p36088'},
+  {fam:'pisoteto',cap:54000,v:220,marca:'LG',nome:'LG 54.000 Teto Wi-Fi Inverter',url:'https://www.ramsons.com.br/ar-condicionado-00086331-p38424'},
+  {fam:'pisoteto',cap:55000,v:220,marca:'TCL',nome:'TCL 55.000 Piso-Teto Inverter',url:'https://www.ramsons.com.br/ar-split-00085532-p38071'},
+  {fam:'pisoteto',cap:60000,v:220,marca:'Carrier',nome:'Carrier 60.000 XPower Inverter',url:'https://www.ramsons.com.br/ar-condicionado-00086333-p38426'},
+  {fam:'cassete',cap:18000,v:220,marca:'Gree',nome:'Gree 18.000 Cassete Inverter',url:'https://www.ramsons.com.br/ar-cassete-00085919-p38440'},
+  {fam:'cassete',cap:18000,v:220,marca:'Carrier',nome:'Carrier 18.000 Cassete 1 Via',url:'https://www.ramsons.com.br/ar-split-00086450-p38625'},
+  {fam:'cassete',cap:22000,v:220,marca:'Gree',nome:'Gree 22.000 Cassete Inverter',url:'https://www.ramsons.com.br/ar-condicionado-cassete-00085922-p35126'},
+  {fam:'cassete',cap:36000,v:220,marca:'Electrolux',nome:'Electrolux 36.000 Cassete 8 Vias',url:'https://www.ramsons.com.br/ar-condicionado-00086187-p37477'},
+  {fam:'cassete',cap:48000,v:220,marca:'Electrolux',nome:'Electrolux 48.000 Cassete Trifásico',url:'https://www.ramsons.com.br/ar-condicionado-00086190-p37475'},
+  {fam:'cassete',cap:54000,v:220,marca:'Carrier',nome:'Carrier 54.000 Cassete 4 Vias',url:'https://www.ramsons.com.br/ar-00086402-p38665'},
+  {fam:'cassete',cap:56000,v:220,marca:'Gree',nome:'Gree 56.000 Cassete Inverter',url:'https://www.ramsons.com.br/00085916-ar-cassete-p38412'},
+];
+const FAM={split:{nome:'Split Hi-Wall',icon:'ti-air-conditioning',foco:'Residencial & escritórios'},janela:{nome:'Ar de Janela',icon:'ti-window',foco:'Custo-benefício, precisa do vão'},pisoteto:{nome:'Piso-Teto',icon:'ti-wind',foco:'Varejo e ambientes amplos'},cassete:{nome:'Cassete',icon:'ti-grid-dots',foco:'Comercial sofisticado, forro de gesso'}};
+const ROOMS={
+  quarto:{tipo:'residencial',icon:'ti-bed',nome:'Quarto',classe:'resid',sol:600,pessoas:2,equip:1,area:12},
+  sala:{tipo:'residencial',icon:'ti-sofa',nome:'Sala',classe:'resid',sol:700,pessoas:3,equip:2,area:20},
+  cozinha:{tipo:'residencial',icon:'ti-tools-kitchen-2',nome:'Cozinha',classe:'resid',sol:800,pessoas:2,equip:3,area:14},
+  banheiro:{tipo:'residencial',icon:'ti-bath',nome:'Banheiro',classe:'resid',sol:600,pessoas:1,equip:0,area:6},
+  homeoffice:{tipo:'residencial',icon:'ti-device-laptop',nome:'Home office',classe:'escr',sol:700,pessoas:2,equip:3,area:10},
+  loja:{tipo:'comercial',icon:'ti-building-store',nome:'Loja',classe:'comerc',sol:800,pessoas:5,equip:2,area:30},
+  escritorio:{tipo:'comercial',icon:'ti-briefcase',nome:'Escritório',classe:'escr',sol:700,pessoas:4,equip:4,area:25},
+  reuniao:{tipo:'comercial',icon:'ti-users',nome:'Reunião',classe:'escr',sol:700,pessoas:6,equip:2,area:20},
+  consultorio:{tipo:'comercial',icon:'ti-stethoscope',nome:'Consultório',classe:'comerc',sol:700,pessoas:3,equip:2,area:16,inst:'gesso'},
+  salao:{tipo:'comercial',icon:'ti-confetti',nome:'Salão festas',classe:'aberto',sol:800,pessoas:15,equip:2,area:50},
+  aberto:{tipo:'comercial',icon:'ti-layout-grid',nome:'Salão aberto',classe:'aberto',sol:800,pessoas:12,equip:3,area:70},
+};
+const AREAS=[6,9,12,15,20,25,30,40,50,60,70];
+const MARCA_PRIOR=['LG','Samsung','Springer Midea','Midea','Gree','Electrolux','TCL','Elgin','Carrier','Mystic'];
+const S={imovel:'residencial',room:'quarto',area:12,sol:600,cobertura:0,pd:0,pessoas:2,equip:0,voltagem:220,tipo:'inverter',instalacao:'indiferente'};
+const $=s=>document.querySelector(s);
+const fmt=n=>Math.round(n).toLocaleString('pt-BR');
+const hint=(id,show,html,warn)=>{const e=$(id);if(show){e.innerHTML=`<i class="ti ${warn?'ti-alert-triangle':'ti-info-circle'}"></i><span>${html}</span>`;e.hidden=false;}else{e.hidden=true;}};
+
+function renderRooms(){const el=$('#rooms');el.innerHTML='';Object.entries(ROOMS).filter(([,r])=>r.tipo===S.imovel).forEach(([k,r])=>{const b=document.createElement('button');b.dataset.v=k;b.innerHTML=`<i class="ti ${r.icon}"></i><span>${r.nome}</span>`;if(k===S.room)b.classList.add('on');b.onclick=()=>applyRoom(k);el.appendChild(b);});}
+function applyRoom(k){S.room=k;const r=ROOMS[k];S.sol=r.sol;S.pessoas=r.pessoas;S.equip=r.equip;S.area=r.area;S.instalacao=r.inst||'indiferente';$('#area').value=r.area;$('#pessoas').textContent=r.pessoas;$('#equip').textContent=r.equip;document.querySelectorAll('#rooms button').forEach(b=>b.classList.toggle('on',b.dataset.v===k));document.querySelectorAll('#sol button').forEach(b=>b.classList.toggle('on',+b.dataset.v===r.sol));syncChips();calc();}
+
+const chipsEl=$('#chips');AREAS.forEach(a=>{const b=document.createElement('button');b.dataset.v=a;b.textContent=a+' m²';b.onclick=()=>{S.area=a;$('#area').value=a;syncChips();calc();};chipsEl.appendChild(b);});
+function syncChips(){document.querySelectorAll('#chips button').forEach(b=>b.classList.toggle('on',+b.dataset.v===S.area));}
+function seg(id,key,cast=v=>v,after){document.querySelectorAll(`#${id} button`).forEach(b=>b.onclick=()=>{document.querySelectorAll(`#${id} button`).forEach(x=>x.classList.remove('on'));b.classList.add('on');S[key]=cast(b.dataset.v);if(after)after();calc();});}
+seg('imovel','imovel',v=>v,()=>{const first=Object.keys(ROOMS).find(k=>ROOMS[k].tipo===S.imovel);renderRooms();applyRoom(first);});
+seg('sol','sol',Number);seg('cobertura','cobertura',Number);seg('pedireito','pd',Number);seg('voltagem','voltagem',Number);seg('tipo','tipo');
+document.querySelectorAll('.stepper').forEach(st=>{const key=st.dataset.step;st.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{S[key]=Math.max(0,S[key]+ +btn.dataset.d);$('#'+key).textContent=S[key];calc();});});
+$('#area').oninput=e=>{S.area=Math.max(0,+e.target.value||0);syncChips();calc();};
+
+function computar(){const base=S.area*S.sol,bp=Math.max(0,S.pessoas-2)*600,be=S.equip*600,sub=base+bp+be,aj=sub*(S.cobertura+S.pd);return {base,bp,be,aj,total:Math.ceil((sub+aj)/100)*100};}
+function capsDe(fam){return [...new Set(PRODUTOS.filter(p=>p.fam===fam).map(p=>p.cap))].sort((a,b)=>a-b);}
+function pick(fam,btu){const caps=capsDe(fam),cap=caps.find(c=>c>=btu);if(cap)return {fam,cap,qtd:1};const max=caps[caps.length-1];return {fam,cap:max,qtd:Math.ceil(btu/max)};}
+function resolver(fam,cap,v){let ps=PRODUTOS.filter(p=>p.fam===fam&&p.cap===cap&&p.v===v),nota=null;if(!ps.length){ps=PRODUTOS.filter(p=>p.fam===fam&&p.cap===cap);if(ps.length)nota='outraV';}ps=ps.slice().sort((a,b)=>MARCA_PRIOR.indexOf(a.marca)-MARCA_PRIOR.indexOf(b.marca));return {ps,nota};}
+function recomendar(btu){const cl=ROOMS[S.room].classe,aberto=(cl==='aberto'||cl==='comerc');if(S.instalacao==='gesso')return pick('cassete',btu);if(S.instalacao==='buraco'&&btu<=20000)return pick('janela',btu);if(btu>32000||aberto)return pick('pisoteto',btu);return pick('split',btu);}
+function dividir(btu){const caps=capsDe('split'),cap=caps.find(c=>c>=Math.ceil(btu/2));return cap?{cap,qtd:2}:null;}
+
+function calc(){
+  const c=computar();$('#btuOut').textContent=fmt(c.total);
+  const bd=$('#brk');bd.innerHTML='';
+  const rows=[[`Base · ${fmt(S.area)} m² × ${S.sol}`,fmt(c.base)]];
+  if(c.bp)rows.push([`Pessoas (${S.pessoas})`,'+'+fmt(c.bp)]);
+  if(c.be)rows.push([`Equipamentos (${S.equip})`,'+'+fmt(c.be)]);
+  if(c.aj)rows.push([`Cobertura / pé-direito`,'+'+fmt(c.aj)]);
+  rows.forEach(([k,v])=>bd.insertAdjacentHTML('beforeend',`<li><span>${k}</span><b>${v}</b></li>`));
+  bd.insertAdjacentHTML('beforeend',`<li class="tot"><span>Total</span><b>${fmt(c.total)} BTUs</b></li>`);
+
+  const sel=recomendar(c.total),f=FAM[sel.fam],capTot=sel.cap*sel.qtd,folga=Math.round((capTot-c.total)/c.total*100);
+  const {ps,nota}=resolver(sel.fam,sel.cap,S.voltagem),main=ps[0],outras=ps.slice(1,4),vShow=main?main.v:S.voltagem;
+  let h=`<div class="k">Aparelho recomendado</div><div class="row"><div class="ic"><i class="ti ${f.icon}"></i></div><div><div class="nm">${sel.qtd>1?sel.qtd+'× ':''}${f.nome}</div><div class="cap">${fmt(sel.cap)} BTUs${sel.qtd>1?` · ${fmt(capTot)} totais`:''} · ${vShow}V</div><div class="foco">${f.foco}</div></div></div>`;
+  if(main){h+=`<div class="pn"><b>${main.marca}</b> — ${main.nome}</div><a class="verbtn" href="${main.url}" target="_blank" rel="noopener">Ver na Ramsons <i class="ti ti-external-link"></i></a>`;if(outras.length)h+=`<div class="brands">Outras marcas: ${outras.map(o=>`<a href="${o.url}" target="_blank" rel="noopener">${o.marca}</a>`).join(' · ')}</div>`;}
+  h+=`<div class="meta"><span class="tag">${S.tipo==='inverter'?'Inverter':'On/off'}</span>${folga>=0?`<span class="tag folga">folga ${folga}%</span>`:''}<span class="tag v">${vShow}V</span></div>`;
+  $('#prod').innerHTML=h;
+
+  // alternativa dinâmica (slim)
+  const alt=$('#alt');alt.hidden=true;
+  if(c.total>=30000){const d=dividir(c.total);if(d){const r=resolver('split',d.cap,S.voltagem).ps[0];alt.innerHTML=`<span class="l">Alternativa</span><span>2× Split ${fmt(d.cap)} distribui melhor num ambiente amplo${r?` · <a href="${r.url}" target="_blank" rel="noopener">${r.marca}</a>`:''}</span>`;alt.hidden=false;}}
+  else if(sel.fam==='split'&&c.total<=20000&&S.instalacao!=='buraco'){const j=pick('janela',c.total),r=resolver('janela',j.cap,S.voltagem).ps[0];if(r){alt.innerHTML=`<span class="l">Custo-benefício</span><span><a href="${r.url}" target="_blank" rel="noopener">Janela ${fmt(j.cap)} ${r.marca}</a> se já houver o vão na parede</span>`;alt.hidden=false;}}
+
+  // dicas contextuais (só quando disparadas)
+  hint('#hCob',S.cobertura>=0.12,'Cobertura quente. Vale orientar forro ou isolamento para reduzir consumo.',true);
+  hint('#hRoom',S.room==='cozinha','Cozinha soma calor do fogão e da geladeira. Confira os equipamentos.',false);
+  if(S.tipo==='onoff'&&folga>20) hint('#hTec',true,'Folga alta em aparelho fixo gera ciclo curto e ar frio e abafado. Prefira Inverter.',true);
+  else if(S.tipo==='onoff') hint('#hTec',true,'No clima úmido de Manaus, o Inverter desumidifica melhor e gasta menos.',false);
+  else hint('#hTec',false);
+
+  const tips=$('#tips');tips.innerHTML='';
+  if(nota==='outraV') tips.insertAdjacentHTML('beforeend',`<div class="tip warn"><i class="ti ti-plug-connected-x"></i><span>Nesta capacidade só há 220V. Para 127V, o Ar de Janela vai até 12.000 BTUs.</span></div>`);
+  if(sel.qtd>1) tips.insertAdjacentHTML('beforeend',`<div class="tip"><i class="ti ti-versions"></i><span>A necessidade passa da maior unidade. O ideal são ${sel.qtd} aparelhos dividindo o ambiente.</span></div>`);
+}
+
+renderRooms();applyRoom('quarto');
+</script>
+</body>
+</html>
