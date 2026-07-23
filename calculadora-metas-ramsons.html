@@ -40,7 +40,7 @@
   .top::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;
     background:radial-gradient(circle,rgba(254,206,72,.30),transparent 65%);}
   .brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
-  .logo{font-family:'Poppins';font-weight:800;font-size:18px;letter-spacing:.5px;color:#fff;cursor:pointer}
+  .logo{height:20px;display:block;background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer}
   .hdr-title{position:relative;z-index:1;font-family:'Poppins';font-weight:800;font-size:19px;
     line-height:1.25;margin-top:6px}
 
@@ -57,7 +57,6 @@
   .step.on{display:block}
   .screen{display:none;animation:rise .35s ease}
   .screen.on{display:block}
-  .logo{cursor:pointer}
 
   /* MENU */
   .menu-grid{display:grid;gap:14px;margin-top:6px}
@@ -69,6 +68,14 @@
   .menu-ic{font-size:28px;margin-bottom:6px}
   .menu-tit{font-family:'Poppins';font-weight:800;font-size:17px;color:var(--ink)}
   .menu-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.4}
+
+  /* SAUDAÇÃO */
+  .greet-card{background:linear-gradient(135deg,#fff,var(--cloud));border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px}
+  .greet-hello{font-family:'Poppins';font-weight:800;font-size:16px;color:var(--ink)}
+  .greet-quote{font-size:13px;color:var(--muted);font-style:italic;margin-top:7px;line-height:1.45;
+    min-height:19px;transition:opacity .4s ease}
+  .greet-quote.fade{opacity:0}
 
   /* VOLTAR AO INÍCIO */
   .home-link{display:inline-block;font-size:12px;color:var(--muted);font-weight:700;
@@ -228,7 +235,7 @@
 
 <header class="top">
   <div class="brand">
-    <div class="logo" onclick="showScreen('Menu')">RAMSONS</div>
+    <img src="assets/ramsons-logo.png" alt="Ramsons" class="logo" onclick="showScreen('Menu')">
   </div>
   <h1 class="hdr-title" id="hdrTitle">Escolha sua calculadora</h1>
 </header>
@@ -243,6 +250,10 @@
 
   <!-- MENU -->
   <div class="screen on" id="screenMenu">
+    <div class="greet-card">
+      <div class="greet-hello" id="greetHello">☀️ Bom dia, Time Ramsons!</div>
+      <div class="greet-quote" id="greetQuote"></div>
+    </div>
     <div class="menu-grid">
       <button class="menu-card" onclick="showScreen('Metas')">
         <span class="menu-ic">🎯</span>
@@ -371,8 +382,6 @@
         <div class="lbl">de cada cliente abordado vira venda</div>
         <div class="verdict" id="rVerdict"></div>
       </div>
-
-      <p class="foot-note" style="margin-top:16px"><b>Time Ramsons</b></p>
     </div>
 
     <div class="sec-h"><span class="bar"></span><h3>E se você abordasse mais?</h3><span class="hint">arraste o número</span></div>
@@ -971,6 +980,7 @@ function showScreen(name){
   document.getElementById('hdrTitle').textContent = titles[name];
   document.getElementById('progress').style.display = name==='Metas' ? 'flex' : 'none';
   if(name==='Metas') paintProgress();
+  if(name==='Menu') iniciarSaudacao(); else pararSaudacao();
 
   const slug = Object.keys(SLUGS).find(k=>SLUGS[k]===name) || '';
   history.replaceState(null, '', slug ? '#'+slug : location.pathname+location.search);
@@ -1140,9 +1150,67 @@ function limparEficiencia(){
   document.getElementById('errEficiencia').textContent='';
 }
 
+/* ---------- Saudação + frase motivacional (horário de Manaus, UTC-4) ---------- */
+const FRASES_MOTIVACIONAIS = [
+  "Cliente que entra na loja já é meio caminho andado — o resto é atendimento.",
+  "Quem aborda mais, vende mais. Simples assim.",
+  "Cada não é um passo mais perto do próximo sim.",
+  "Meta boa é meta batida todo santo dia, não só no fim do mês.",
+  "Sorriso, escuta e solução — é isso que fecha venda.",
+  "O cliente não compra o produto, compra a confiança que você passou.",
+  "Não venda o que sobra pra você, venda o que resolve pra ele.",
+  "Bater meta é hábito, não sorte.",
+  "Toda venda começa numa boa pergunta, não numa boa resposta.",
+  "Seu próximo cliente pode ser o seu melhor atendimento do mês. Vai lá.",
+  "Atenção total no cliente é o diferencial que não custa nada e vale tudo.",
+  "Quem cuida bem do pós-venda garante o pré-venda do próximo cliente.",
+  "Anexo bem oferecido nunca é empurrado, é bem-vindo.",
+  "Grande vendedor não convence, ele entende e resolve.",
+  "Foco no cliente de agora — o próximo a gente resolve quando chegar."
+];
+function horaManaus(){
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset()*60000;
+  return new Date(utcMs + (-4)*3600000).getHours();
+}
+function saudacaoAtual(){
+  const h = horaManaus();
+  if(h>=5 && h<12) return {txt:'Bom dia', ic:'☀️'};
+  if(h>=12 && h<18) return {txt:'Boa tarde', ic:'🌤️'};
+  return {txt:'Boa noite', ic:'🌙'};
+}
+let _fraseIdx = Math.floor(Math.random()*FRASES_MOTIVACIONAIS.length);
+let _fraseTimer = null;
+function pintarFrase(){
+  const el = document.getElementById('greetQuote');
+  if(el) el.textContent = '"'+FRASES_MOTIVACIONAIS[_fraseIdx]+'"';
+}
+function girarFrase(){
+  const el = document.getElementById('greetQuote');
+  if(!el) return;
+  el.classList.add('fade');
+  setTimeout(()=>{
+    _fraseIdx = (_fraseIdx+1) % FRASES_MOTIVACIONAIS.length;
+    pintarFrase();
+    el.classList.remove('fade');
+  }, 400);
+}
+function iniciarSaudacao(){
+  const s = saudacaoAtual();
+  const hEl = document.getElementById('greetHello');
+  if(hEl) hEl.innerHTML = `${s.ic} ${s.txt}, Time Ramsons!`;
+  pintarFrase();
+  if(_fraseTimer) clearInterval(_fraseTimer);
+  _fraseTimer = setInterval(girarFrase, 8000);
+}
+function pararSaudacao(){
+  if(_fraseTimer){ clearInterval(_fraseTimer); _fraseTimer=null; }
+}
+
 /* ---------- Roteamento inicial por link direto (#metas, #parcela, #eficiencia) ---------- */
 const hashSlug = location.hash.replace('#','').toLowerCase();
 if(SLUGS[hashSlug]) showScreen(SLUGS[hashSlug]);
+else iniciarSaudacao();
 
 load();
 paintProgress();

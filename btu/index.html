@@ -75,11 +75,17 @@
   /* resultado */
   .result{position:sticky;top:14px}
   .result .card{padding:0;overflow:hidden}
-  .hero{background:var(--cool-soft);padding:16px 18px;display:flex;align-items:flex-end;justify-content:space-between}
-  .hero .lbl{font-size:11.5px;font-weight:600;color:var(--cool-ink);text-transform:uppercase;letter-spacing:.05em}
-  .hero .big{font-family:"Archivo";font-weight:800;font-size:44px;line-height:.95;color:var(--cool-ink);letter-spacing:-.02em;margin-top:4px}
+  .hero{background:var(--cool-soft);padding:16px 18px;display:flex;align-items:flex-end;justify-content:space-between;position:relative;overflow:hidden}
+  .hero .lbl{font-size:11.5px;font-weight:600;color:var(--cool-ink);text-transform:uppercase;letter-spacing:.05em;position:relative;z-index:1}
+  .hero .big{font-family:"Archivo";font-weight:800;font-size:44px;line-height:.95;color:var(--cool-ink);letter-spacing:-.02em;margin-top:4px;position:relative;z-index:1}
   .hero .big small{font-size:16px;font-weight:600}
-  .hero i{font-size:26px;color:var(--cool);opacity:.7}
+  .hero i{font-size:26px;color:var(--cool);opacity:.7;position:relative;z-index:1;display:inline-block;animation:snowSpin 7s linear infinite}
+  .hero::before{content:"";position:absolute;left:-34px;top:-34px;width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,175,64,.30),transparent 70%);animation:sunPulse 6s ease-in-out infinite}
+  .hero .flake{position:absolute;top:-12%;color:rgba(14,143,168,.4);font-size:13px;pointer-events:none;animation:flakeFall linear infinite}
+  @keyframes sunPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.18)}}
+  @keyframes snowSpin{0%{transform:rotate(0deg)}50%{transform:rotate(180deg) scale(1.1)}100%{transform:rotate(360deg)}}
+  @keyframes flakeFall{0%{transform:translateY(-10px);opacity:0}10%{opacity:1}90%{opacity:.8}100%{transform:translateY(140px);opacity:0}}
   .rb{padding:16px 18px}
   .brk{list-style:none;font-size:12px;margin-bottom:14px}
   .brk li{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
@@ -117,10 +123,18 @@
 
   .foot{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.5;text-align:center}
 
+  .script-box{margin-top:14px;background:var(--cool-soft);border:1px solid rgba(14,143,168,.25);border-radius:10px;padding:14px 16px}
+  .script-head{display:flex;align-items:center;gap:7px;font-family:"Archivo";font-weight:700;font-size:12px;
+    color:var(--cool-ink);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+  .script-box p{font-size:13px;line-height:1.55;color:#374151}
+  .script-copy{margin-top:11px;font-family:"Archivo";font-weight:700;font-size:12.5px;border:none;border-radius:8px;
+    padding:9px 14px;background:var(--cool);color:#fff;cursor:pointer;transition:filter .15s}
+  .script-copy:hover{filter:brightness(1.08)}
+
   /* Navegação padrão do projeto Ramsons */
   .rmn-bar{background:linear-gradient(135deg,#DD2638,#B3162A);color:#fff;padding:10px 18px;
     display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:"Inter",system-ui,sans-serif}
-  .rmn-brand{font-weight:800;font-size:15px;letter-spacing:.5px}
+  .rmn-brand{height:18px;display:block;background:#fff;border-radius:999px;padding:4px 10px}
   .rmn-home{color:#fff;text-decoration:none;font-size:12px;font-weight:700;background:rgba(255,255,255,.15);
     border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:6px 14px;white-space:nowrap}
   .rmn-home:hover{background:rgba(255,255,255,.25)}
@@ -128,7 +142,7 @@
 </head>
 <body>
 <div class="rmn-bar">
-  <div class="rmn-brand">RAMSONS</div>
+  <img src="../assets/ramsons-logo.png" alt="Ramsons" class="rmn-brand">
   <a class="rmn-home" href="../">← Início</a>
 </div>
 <div class="wrap">
@@ -175,12 +189,21 @@
 
     <div class="result">
       <div class="card">
-        <div class="hero"><div><div class="lbl">BTUs necessários</div><div class="big"><span id="btuOut">0</span> <small>BTUs</small></div></div><i class="ti ti-snowflake"></i></div>
+        <div class="hero">
+          <span class="flake" style="left:18%;animation-duration:6.5s;animation-delay:.2s">❄</span>
+          <span class="flake" style="left:52%;animation-duration:8s;animation-delay:2.1s">❄</span>
+          <span class="flake" style="left:78%;animation-duration:7.2s;animation-delay:1s">❄</span>
+          <div><div class="lbl">BTUs necessários</div><div class="big"><span id="btuOut">0</span> <small>BTUs</small></div></div><i class="ti ti-snowflake"></i></div>
         <div class="rb">
           <ul class="brk" id="brk"></ul>
           <div class="prod" id="prod"></div>
           <div class="alt" id="alt" hidden></div>
           <div id="tips"></div>
+          <div class="script-box">
+            <div class="script-head"><i class="ti ti-message-2"></i> Script pra explicar pro cliente</div>
+            <p id="scriptText"></p>
+            <button class="script-copy" id="scriptCopyBtn">Copiar texto</button>
+          </div>
         </div>
       </div>
     </div>
@@ -286,7 +309,7 @@ function calc(){
   const sel=recomendar(c.total),f=FAM[sel.fam],capTot=sel.cap*sel.qtd,folga=Math.round((capTot-c.total)/c.total*100);
   const {ps,nota}=resolver(sel.fam,sel.cap,S.voltagem),main=ps[0],outras=ps.slice(1,4),vShow=main?main.v:S.voltagem;
   let h=`<div class="k">Aparelho recomendado</div><div class="row"><div class="ic"><i class="ti ${f.icon}"></i></div><div><div class="nm">${sel.qtd>1?sel.qtd+'× ':''}${f.nome}</div><div class="cap">${fmt(sel.cap)} BTUs${sel.qtd>1?` · ${fmt(capTot)} totais`:''} · ${vShow}V</div><div class="foco">${f.foco}</div></div></div>`;
-  if(main){h+=`<div class="pn"><b>${main.marca}</b> — ${main.nome}</div><a class="verbtn" href="${main.url}" target="_blank" rel="noopener">Ver na Ramsons <i class="ti ti-external-link"></i></a>`;if(outras.length)h+=`<div class="brands">Outras marcas: ${outras.map(o=>`<a href="${o.url}" target="_blank" rel="noopener">${o.marca}</a>`).join(' · ')}</div>`;}
+  if(main){h+=`<div class="pn"><b>${main.nome}</b></div><a class="verbtn" href="${main.url}" target="_blank" rel="noopener">Ver na Ramsons <i class="ti ti-external-link"></i></a>`;if(outras.length)h+=`<div class="brands">Outras marcas: ${outras.map(o=>`<a href="${o.url}" target="_blank" rel="noopener">${o.marca}</a>`).join(' · ')}</div>`;}
   h+=`<div class="meta"><span class="tag">${S.tipo==='inverter'?'Inverter':'On/off'}</span>${folga>=0?`<span class="tag folga">folga ${folga}%</span>`:''}<span class="tag v">${vShow}V</span></div>`;
   $('#prod').innerHTML=h;
 
@@ -305,7 +328,30 @@ function calc(){
   const tips=$('#tips');tips.innerHTML='';
   if(nota==='outraV') tips.insertAdjacentHTML('beforeend',`<div class="tip warn"><i class="ti ti-plug-connected-x"></i><span>Nesta capacidade só há 220V. Para 127V, o Ar de Janela vai até 12.000 BTUs.</span></div>`);
   if(sel.qtd>1) tips.insertAdjacentHTML('beforeend',`<div class="tip"><i class="ti ti-versions"></i><span>A necessidade passa da maior unidade. O ideal são ${sel.qtd} aparelhos dividindo o ambiente.</span></div>`);
+
+  $('#scriptText').textContent = gerarScript(c,sel,f,main,folga);
 }
+
+function gerarScript(c,sel,f,main,folga){
+  const p=[];
+  p.push(`Olha só como eu cheguei nesse número: um ambiente de ${fmt(S.area)} m² com essa incidência de sol já pede ${fmt(c.base)} BTUs de base.`);
+  if(c.bp) p.push(`Como são ${S.pessoas} pessoas usando o espaço, cada pessoa a mais (além das 2 primeiras) libera calor do próprio corpo — por isso somei mais ${fmt(c.bp)} BTUs.`);
+  if(c.be) p.push(`Você tem ${S.equip} equipamento${S.equip>1?'s':''} que esquenta${S.equip>1?'m':''} o ambiente, tipo TV, computador ou forno, e isso soma mais ${fmt(c.be)} BTUs.`);
+  if(c.aj) p.push(`O tipo de cobertura e a altura do teto também pedem um reforço de ${fmt(c.aj)} BTUs, porque deixam entrar mais calor de fora.`);
+  p.push(`Somando tudo, fecha em ${fmt(c.total)} BTUs — por isso a indicação é ${sel.qtd>1?`${sel.qtd} aparelhos de`:'um'} ${f.nome} de ${fmt(sel.cap)} BTUs${main?`, como o ${main.nome}`:''}.`);
+  if(folga>=0) p.push(`Esse modelo ainda fica com ${folga}% de folga, então ele dá conta do recado sem forçar a máquina e sem gastar energia à toa.`);
+  if(sel.qtd>1) p.push(`Como a necessidade passa da maior unidade disponível, o ideal mesmo são ${sel.qtd} aparelhos dividindo bem o ambiente.`);
+  return p.join(' ');
+}
+
+$('#scriptCopyBtn').addEventListener('click',()=>{
+  const txt=$('#scriptText').textContent;
+  const btn=$('#scriptCopyBtn'), original=btn.textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent='Copiado! ✓';
+    setTimeout(()=>btn.textContent=original,1500);
+  }).catch(()=>{});
+});
 
 renderRooms();applyRoom('quarto');
 </script>

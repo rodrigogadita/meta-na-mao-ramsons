@@ -31,7 +31,7 @@
     color:#fff;text-decoration:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
     border-radius:99px;padding:7px 14px;white-space:nowrap}
   .home-pill:hover{background:rgba(255,255,255,.2)}
-  .logo{font-family:var(--disp);font-weight:800;font-size:22px;letter-spacing:.5px;background:var(--red);color:#fff;padding:5px 12px;border-radius:8px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+  .logo{height:26px;display:block}
   .tagline{font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:2.5px;color:var(--gold);text-transform:uppercase}
   h1{font-family:var(--disp);font-weight:700;font-size:clamp(20px,3.4vw,28px);margin-top:16px;position:relative;z-index:1;line-height:1.15}
   .sub{color:#B9C4D6;font-size:14px;margin-top:6px;position:relative;z-index:1}
@@ -180,7 +180,7 @@
 
   <header>
     <div class="brand">
-      <span class="logo">RAMSONS</span>
+      <img src="../assets/ramsons-logo.png" alt="Ramsons" class="logo">
       <span class="tagline">Cada dia mais você</span>
       <a href="../" class="home-pill">← Início</a>
     </div>
@@ -301,7 +301,7 @@
             </select>
           </div>
           <div class="fgroup">
-            <label class="flabel" for="f-sup"><span class="num">3</span>Suporte de fixação <small style="font-weight:400;color:var(--muted)">(pergunta 10)</small></label>
+            <label class="flabel" for="f-sup"><span class="num">3</span>Suporte de fixação</label>
             <select id="f-sup">
               <option value="none">Não precisa — R$ 0</option>
               <option value="s450">Suporte 450 mm — R$ 20</option>
@@ -313,35 +313,35 @@
             <label class="chk" style="margin-top:8px"><input type="checkbox" id="a-sptt"> Par suporte evaporadora — automático p/ Piso Teto <span class="cval">+ R$ 100</span></label>
           </div>
           <div class="fgroup">
-            <label class="flabel"><span class="num">4</span>Adequações do local (perguntas do quiz)</label>
+            <label class="flabel"><span class="num">4</span>Adequações do local</label>
           </div>
           <div class="fgroup">
-            <label class="flabel-sub" for="f-reboco">2 · Existe reboco interno e externo?</label>
+            <label class="flabel-sub" for="f-reboco">Existe reboco interno e externo?</label>
             <select id="f-reboco">
-              <option value="0">A) Sim, tem reboco — R$ 0</option>
-              <option value="280">B) Não tem reboco — + R$ 280</option>
+              <option value="0">Sim, tem reboco — R$ 0</option>
+              <option value="280">Não tem reboco — + R$ 280</option>
             </select>
           </div>
           <div class="fgroup">
-            <label class="flabel-sub" for="f-ponto">4 · Onde está o ponto elétrico 220V?</label>
+            <label class="flabel-sub" for="f-ponto">Onde está o ponto elétrico 220V?</label>
             <select id="f-ponto">
-              <option value="0">A) Na unidade externa / já existe — R$ 0</option>
-              <option value="60">B) Na unidade interna (até 10 m) — + R$ 60</option>
-              <option value="600">C) No quadro elétrico (até 30 m) — + R$ 600</option>
-              <option value="pend">E) Não sei — avaliar por foto/vídeo</option>
+              <option value="0">Na unidade externa / já existe — R$ 0</option>
+              <option value="60">Na unidade interna (até 10 m) — + R$ 60</option>
+              <option value="600">No quadro elétrico (até 30 m) — + R$ 600</option>
+              <option value="pend">Não sei — avaliar por foto/vídeo</option>
             </select>
           </div>
           <div class="fgroup">
-            <label class="flabel-sub" for="f-aterr">5 · Onde está o aterramento?</label>
+            <label class="flabel-sub" for="f-aterr">Onde está o aterramento?</label>
             <select id="f-aterr">
-              <option value="0">A) Na unidade externa / já existe — R$ 0</option>
-              <option value="45">B) Na unidade interna (até 10 m) — + R$ 45</option>
-              <option value="360">C) No quadro elétrico (até 30 m) — + R$ 360</option>
-              <option value="380">D) Exclusivo na condensadora (até 20 m) — + R$ 380</option>
+              <option value="0">Na unidade externa / já existe — R$ 0</option>
+              <option value="45">Na unidade interna (até 10 m) — + R$ 45</option>
+              <option value="360">No quadro elétrico (até 30 m) — + R$ 360</option>
+              <option value="380">Exclusivo na condensadora (até 20 m) — + R$ 380</option>
             </select>
           </div>
           <div class="fgroup">
-            <label class="flabel-sub" for="f-desinst">6 e 7 · Aparelho antigo / desinstalação</label>
+            <label class="flabel-sub" for="f-desinst">Aparelho antigo / desinstalação</label>
             <select id="f-desinst">
               <option value="0">Não há aparelho antigo — R$ 0</option>
               <option value="0nd">Tem, mas não quer desinstalação — R$ 0</option>
